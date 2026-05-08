@@ -1,0 +1,862 @@
+{
+  "pipeline_version": "1.0.0",
+  "generated_at": "2026-05-08T11:39:16.512733Z",
+  "source_file": "mock_cognos_report.xml",
+  "report_name": "Life_Insurance_Underwriting_Summary",
+  "intermediate_representation": {
+    "report_name": "Life_Insurance_Underwriting_Summary",
+    "source_system": "Cognos",
+    "version": "1.0",
+    "metadata": {
+      "author": "UW Analytics Team",
+      "created_date": "2023-06-01",
+      "last_modified": "2024-01-15",
+      "data_source": "UW_DW_PROD",
+      "subject": "Monthly Underwriting Performance"
+    },
+    "summary": {
+      "visual_count": 9,
+      "filter_count": 3,
+      "calc_count": 8,
+      "field_count": 21,
+      "prompt_count": 4,
+      "query_count": 2
+    },
+    "visuals": [
+      {
+        "id": "DecisionBreakdownChart",
+        "cognos_type": "chart",
+        "normalized_type": "bar_chart",
+        "title": "Underwriting Decisions Distribution",
+        "fields": [
+          "Decision",
+          "Total Policies Issued"
+        ],
+        "query_ref": "MainQuery",
+        "raw": {
+          "id": "DecisionBreakdownChart",
+          "cognos_type": "chart",
+          "chart_subtype": "bar",
+          "query": "MainQuery",
+          "categories": "Decision",
+          "values": [
+            "Total Policies Issued"
+          ],
+          "title": "Underwriting Decisions Distribution"
+        },
+        "pbi_visual_type": "clusteredBarChart",
+        "migration_support": "full",
+        "migration_notes": "Direct mapping. Map categories\u2192Axis, values\u2192Values."
+      },
+      {
+        "id": "MonthlyVolumeTrend",
+        "cognos_type": "chart",
+        "normalized_type": "line_chart",
+        "title": "Monthly Policy Volume and Face Amount Trend",
+        "fields": [
+          "Issue Date",
+          "Total Policies Issued",
+          "Total Face Amount"
+        ],
+        "query_ref": "MainQuery",
+        "raw": {
+          "id": "MonthlyVolumeTrend",
+          "cognos_type": "chart",
+          "chart_subtype": "line",
+          "query": "MainQuery",
+          "categories": "Issue Date",
+          "values": [
+            "Total Policies Issued",
+            "Total Face Amount"
+          ],
+          "title": "Monthly Policy Volume and Face Amount Trend"
+        },
+        "pbi_visual_type": "lineChart",
+        "migration_support": "full",
+        "migration_notes": "Direct mapping. Map categories\u2192Axis, values\u2192Values."
+      },
+      {
+        "id": "SmokerDistributionChart",
+        "cognos_type": "chart",
+        "normalized_type": "pie_chart",
+        "title": "Smoker vs Non-Smoker Distribution",
+        "fields": [
+          "Smoker Status",
+          "Total Policies Issued"
+        ],
+        "query_ref": "MainQuery",
+        "raw": {
+          "id": "SmokerDistributionChart",
+          "cognos_type": "chart",
+          "chart_subtype": "pie",
+          "query": "MainQuery",
+          "categories": "Smoker Status",
+          "values": [
+            "Total Policies Issued"
+          ],
+          "title": "Smoker vs Non-Smoker Distribution"
+        },
+        "pbi_visual_type": "pieChart",
+        "migration_support": "full",
+        "migration_notes": "Direct mapping. Consider donut chart variant."
+      },
+      {
+        "id": "TotalPoliciesKPI",
+        "cognos_type": "textItem",
+        "normalized_type": "card",
+        "title": "Total Policies Issued",
+        "fields": [
+          "Total Policies Issued"
+        ],
+        "query_ref": null,
+        "raw": {
+          "id": "TotalPoliciesKPI",
+          "cognos_type": "textItem",
+          "chart_subtype": "kpi",
+          "data_source": "Total Policies Issued",
+          "label": "Total Policies Issued"
+        },
+        "pbi_visual_type": "card",
+        "migration_support": "full",
+        "migration_notes": "Use Power BI Card or new Card (v2) visual. Reference DAX measure."
+      },
+      {
+        "id": "TotalFaceAmountKPI",
+        "cognos_type": "textItem",
+        "normalized_type": "card",
+        "title": "Total Face Amount ($)",
+        "fields": [
+          "Total Face Amount"
+        ],
+        "query_ref": null,
+        "raw": {
+          "id": "TotalFaceAmountKPI",
+          "cognos_type": "textItem",
+          "chart_subtype": "kpi",
+          "data_source": "Total Face Amount",
+          "label": "Total Face Amount ($)"
+        },
+        "pbi_visual_type": "card",
+        "migration_support": "full",
+        "migration_notes": "Use Power BI Card or new Card (v2) visual. Reference DAX measure."
+      },
+      {
+        "id": "STPRateKPI",
+        "cognos_type": "textItem",
+        "normalized_type": "card",
+        "title": "STP Rate (%)",
+        "fields": [
+          "STP Rate"
+        ],
+        "query_ref": null,
+        "raw": {
+          "id": "STPRateKPI",
+          "cognos_type": "textItem",
+          "chart_subtype": "kpi",
+          "data_source": "STP Rate",
+          "label": "STP Rate (%)"
+        },
+        "pbi_visual_type": "card",
+        "migration_support": "full",
+        "migration_notes": "Use Power BI Card or new Card (v2) visual. Reference DAX measure."
+      },
+      {
+        "id": "AvgPremiumKPI",
+        "cognos_type": "textItem",
+        "normalized_type": "card",
+        "title": "Average Annual Premium",
+        "fields": [
+          "Avg Premium"
+        ],
+        "query_ref": null,
+        "raw": {
+          "id": "AvgPremiumKPI",
+          "cognos_type": "textItem",
+          "chart_subtype": "kpi",
+          "data_source": "Avg Premium",
+          "label": "Average Annual Premium"
+        },
+        "pbi_visual_type": "card",
+        "migration_support": "full",
+        "migration_notes": "Use Power BI Card or new Card (v2) visual. Reference DAX measure."
+      },
+      {
+        "id": "ProvinceRatingCrosstab",
+        "cognos_type": "crosstab",
+        "normalized_type": "matrix",
+        "title": "Policy Distribution by Province and Rating Class",
+        "fields": [
+          "Province",
+          "Rating Class",
+          "Total Policies Issued",
+          "Avg Premium"
+        ],
+        "query_ref": "MainQuery",
+        "raw": {
+          "id": "ProvinceRatingCrosstab",
+          "cognos_type": "crosstab",
+          "chart_subtype": "matrix",
+          "query": "MainQuery",
+          "rows": "Province",
+          "columns": "Rating Class",
+          "measures": [
+            "Total Policies Issued",
+            "Avg Premium"
+          ],
+          "title": "Policy Distribution by Province and Rating Class"
+        },
+        "pbi_visual_type": "matrix",
+        "migration_support": "partial",
+        "migration_notes": "Cognos crosstab \u2192 PBI Matrix. Custom cell formatting requires manual work."
+      },
+      {
+        "id": "TopPoliciesList",
+        "cognos_type": "list",
+        "normalized_type": "table",
+        "title": "Policy Detail",
+        "fields": [
+          "Policy ID, Issue Date, Face Amount, Annual Premium, Rating Class, Table Rating, Decision"
+        ],
+        "query_ref": "MainQuery",
+        "raw": {
+          "id": "TopPoliciesList",
+          "cognos_type": "list",
+          "chart_subtype": "table",
+          "query": "MainQuery",
+          "columns": "Policy ID, Issue Date, Face Amount, Annual Premium, Rating Class, Table Rating, Decision",
+          "title": "Policy Detail",
+          "sorting": "Face Amount DESC"
+        },
+        "pbi_visual_type": "tableEx",
+        "migration_support": "partial",
+        "migration_notes": "Cognos list \u2192 PBI Table. Conditional formatting and drill-through need manual config."
+      }
+    ],
+    "filters": [
+      {
+        "name": "DateRangeFilter",
+        "cognos_type": "dateRange",
+        "normalized_type": "date_range_slicer",
+        "parameters": [
+          "StartDate",
+          "EndDate"
+        ],
+        "label": "Report Date Range",
+        "preset_values": null
+      },
+      {
+        "name": "DecisionFilter",
+        "cognos_type": "multiSelect",
+        "normalized_type": "multi_select_slicer",
+        "parameters": [
+          "DecisionType"
+        ],
+        "label": "Decision Type",
+        "preset_values": "Approved, Rated, Declined, Postponed"
+      },
+      {
+        "name": "ProvinceFilter",
+        "cognos_type": "multiSelect",
+        "normalized_type": "multi_select_slicer",
+        "parameters": [
+          "ProvinceCode"
+        ],
+        "label": "Province",
+        "preset_values": null
+      }
+    ],
+    "calculations": [
+      {
+        "name": "Total Policies Issued",
+        "expression": "count([POLICY_FACT].[POLICY_ID])",
+        "aggregate": "count",
+        "is_calculated": false,
+        "source_query": "MainQuery",
+        "dax_stub": "[Total Policies Issued] =\n    COUNTROWS(POLICY_FACT)"
+      },
+      {
+        "name": "Total Face Amount",
+        "expression": "total([POLICY_FACT].[FACE_AMOUNT])",
+        "aggregate": "sum",
+        "is_calculated": false,
+        "source_query": "MainQuery",
+        "dax_stub": "[Total Face Amount] =\n    SUM(FACE_AMOUNT)"
+      },
+      {
+        "name": "Avg Premium",
+        "expression": "average([POLICY_FACT].[ANNUAL_PREMIUM])",
+        "aggregate": "average",
+        "is_calculated": false,
+        "source_query": "MainQuery",
+        "dax_stub": "[Avg Premium] =\n    AVERAGE(ANNUAL_PREMIUM)"
+      },
+      {
+        "name": "STP Rate",
+        "expression": "(count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] <= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100",
+        "aggregate": "calculated",
+        "is_calculated": true,
+        "source_query": "MainQuery",
+        "dax_stub": "[STP Rate] =\n    CALCULATE(COUNTROWS(POLICY_FACT), POLICY_FACT[PROCESSING_DAYS] <= 1)"
+      },
+      {
+        "name": "Rated Cases",
+        "expression": "count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))",
+        "aggregate": "calculated",
+        "is_calculated": true,
+        "source_query": "MainQuery",
+        "dax_stub": "[Rated Cases] =\n    COUNTROWS(POLICY_FACT)"
+      },
+      {
+        "name": "Policy Count",
+        "expression": "count([POLICY_FACT].[POLICY_ID])",
+        "aggregate": "count",
+        "is_calculated": false,
+        "source_query": "ProvinceBreakdown",
+        "dax_stub": "[Policy Count] =\n    COUNTROWS(POLICY_FACT)"
+      },
+      {
+        "name": "Total Premium",
+        "expression": "total([POLICY_FACT].[ANNUAL_PREMIUM])",
+        "aggregate": "sum",
+        "is_calculated": false,
+        "source_query": "ProvinceBreakdown",
+        "dax_stub": "[Total Premium] =\n    SUM(ANNUAL_PREMIUM)"
+      },
+      {
+        "name": "Avg Risk Score",
+        "expression": "average([APPLICANT_DIM].[RISK_SCORE])",
+        "aggregate": "average",
+        "is_calculated": false,
+        "source_query": "ProvinceBreakdown",
+        "dax_stub": "[Avg Risk Score] =\n    AVERAGE(RISK_SCORE)"
+      }
+    ],
+    "data_fields": [
+      {
+        "name": "POLICY_ID",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "ISSUE_DATE",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "date"
+      },
+      {
+        "name": "FACE_AMOUNT",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "decimal"
+      },
+      {
+        "name": "ANNUAL_PREMIUM",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "decimal"
+      },
+      {
+        "name": "RATING_CLASS",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "TABLE_RATING",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "FLAT_EXTRA",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "decimal"
+      },
+      {
+        "name": "UNDERWRITER_ID",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "DECISION",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "varchar"
+      },
+      {
+        "name": "PROCESSING_DAYS",
+        "source_table": "POLICY_FACT",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "APPLICANT_ID",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "AGE_AT_ISSUE",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "integer"
+      },
+      {
+        "name": "GENDER",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "varchar"
+      },
+      {
+        "name": "SMOKER_STATUS",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "boolean"
+      },
+      {
+        "name": "PROVINCE",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "varchar"
+      },
+      {
+        "name": "RISK_SCORE",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "decimal"
+      },
+      {
+        "name": "PACK_YEARS",
+        "source_table": "APPLICANT_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "decimal"
+      },
+      {
+        "name": "MIB_CODE",
+        "source_table": "MIB_CHECK_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "varchar"
+      },
+      {
+        "name": "MIB_FLAG",
+        "source_table": "MIB_CHECK_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "boolean"
+      },
+      {
+        "name": "APS_REQUIRED",
+        "source_table": "MIB_CHECK_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "boolean"
+      },
+      {
+        "name": "MVR_REQUIRED",
+        "source_table": "MIB_CHECK_DIM",
+        "data_source": "UW_DW_PROD",
+        "data_type_hint": "boolean"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "StartDate",
+        "type": "date",
+        "required": true,
+        "default_value": "2024-01-01"
+      },
+      {
+        "name": "EndDate",
+        "type": "date",
+        "required": true,
+        "default_value": "2024-12-31"
+      },
+      {
+        "name": "DecisionType",
+        "type": "multiSelect",
+        "required": false,
+        "default_value": null
+      },
+      {
+        "name": "ProvinceCode",
+        "type": "multiSelect",
+        "required": false,
+        "default_value": null
+      }
+    ],
+    "queries": [
+      {
+        "name": "MainQuery",
+        "data_items": [
+          {
+            "name": "Policy ID",
+            "expression": "[POLICY_FACT].[POLICY_ID]",
+            "aggregate": null
+          },
+          {
+            "name": "Issue Date",
+            "expression": "[POLICY_FACT].[ISSUE_DATE]",
+            "aggregate": null
+          },
+          {
+            "name": "Face Amount",
+            "expression": "[POLICY_FACT].[FACE_AMOUNT]",
+            "aggregate": null
+          },
+          {
+            "name": "Annual Premium",
+            "expression": "[POLICY_FACT].[ANNUAL_PREMIUM]",
+            "aggregate": null
+          },
+          {
+            "name": "Rating Class",
+            "expression": "[POLICY_FACT].[RATING_CLASS]",
+            "aggregate": null
+          },
+          {
+            "name": "Table Rating",
+            "expression": "[POLICY_FACT].[TABLE_RATING]",
+            "aggregate": null
+          },
+          {
+            "name": "Flat Extra",
+            "expression": "[POLICY_FACT].[FLAT_EXTRA]",
+            "aggregate": null
+          },
+          {
+            "name": "Decision",
+            "expression": "[POLICY_FACT].[DECISION]",
+            "aggregate": null
+          },
+          {
+            "name": "Processing Days",
+            "expression": "[POLICY_FACT].[PROCESSING_DAYS]",
+            "aggregate": null
+          },
+          {
+            "name": "Applicant Age",
+            "expression": "[APPLICANT_DIM].[AGE_AT_ISSUE]",
+            "aggregate": null
+          },
+          {
+            "name": "Smoker Status",
+            "expression": "[APPLICANT_DIM].[SMOKER_STATUS]",
+            "aggregate": null
+          },
+          {
+            "name": "Province",
+            "expression": "[APPLICANT_DIM].[PROVINCE]",
+            "aggregate": null
+          },
+          {
+            "name": "Risk Score",
+            "expression": "[APPLICANT_DIM].[RISK_SCORE]",
+            "aggregate": null
+          },
+          {
+            "name": "Pack Years",
+            "expression": "[APPLICANT_DIM].[PACK_YEARS]",
+            "aggregate": null
+          },
+          {
+            "name": "MIB Flag",
+            "expression": "[MIB_CHECK_DIM].[MIB_FLAG]",
+            "aggregate": null
+          },
+          {
+            "name": "APS Required",
+            "expression": "[MIB_CHECK_DIM].[APS_REQUIRED]",
+            "aggregate": null
+          },
+          {
+            "name": "Total Policies Issued",
+            "expression": "count([POLICY_FACT].[POLICY_ID])",
+            "aggregate": "count"
+          },
+          {
+            "name": "Total Face Amount",
+            "expression": "total([POLICY_FACT].[FACE_AMOUNT])",
+            "aggregate": "sum"
+          },
+          {
+            "name": "Avg Premium",
+            "expression": "average([POLICY_FACT].[ANNUAL_PREMIUM])",
+            "aggregate": "average"
+          },
+          {
+            "name": "STP Rate",
+            "expression": "(count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] <= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100",
+            "aggregate": "calculated"
+          },
+          {
+            "name": "Rated Cases",
+            "expression": "count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))",
+            "aggregate": "calculated"
+          }
+        ],
+        "calculated_items": [
+          {
+            "name": "STP Rate",
+            "expression": "(count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] <= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100",
+            "aggregate": "calculated"
+          },
+          {
+            "name": "Rated Cases",
+            "expression": "count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))",
+            "aggregate": "calculated"
+          }
+        ],
+        "aggregate_items": [
+          {
+            "name": "Total Policies Issued",
+            "expression": "count([POLICY_FACT].[POLICY_ID])",
+            "aggregate": "count"
+          },
+          {
+            "name": "Total Face Amount",
+            "expression": "total([POLICY_FACT].[FACE_AMOUNT])",
+            "aggregate": "sum"
+          },
+          {
+            "name": "Avg Premium",
+            "expression": "average([POLICY_FACT].[ANNUAL_PREMIUM])",
+            "aggregate": "average"
+          }
+        ],
+        "detail_filters": [
+          "[POLICY_FACT].[ISSUE_DATE] between ?StartDate? and ?EndDate?",
+          "[POLICY_FACT].[DECISION] in ('Approved', 'Rated', 'Declined', 'Postponed')"
+        ]
+      },
+      {
+        "name": "ProvinceBreakdown",
+        "data_items": [
+          {
+            "name": "Province",
+            "expression": "[APPLICANT_DIM].[PROVINCE]",
+            "aggregate": null
+          },
+          {
+            "name": "Policy Count",
+            "expression": "count([POLICY_FACT].[POLICY_ID])",
+            "aggregate": "count"
+          },
+          {
+            "name": "Total Premium",
+            "expression": "total([POLICY_FACT].[ANNUAL_PREMIUM])",
+            "aggregate": "sum"
+          },
+          {
+            "name": "Avg Risk Score",
+            "expression": "average([APPLICANT_DIM].[RISK_SCORE])",
+            "aggregate": "average"
+          }
+        ],
+        "calculated_items": [],
+        "aggregate_items": [
+          {
+            "name": "Policy Count",
+            "expression": "count([POLICY_FACT].[POLICY_ID])",
+            "aggregate": "count"
+          },
+          {
+            "name": "Total Premium",
+            "expression": "total([POLICY_FACT].[ANNUAL_PREMIUM])",
+            "aggregate": "sum"
+          },
+          {
+            "name": "Avg Risk Score",
+            "expression": "average([APPLICANT_DIM].[RISK_SCORE])",
+            "aggregate": "average"
+          }
+        ],
+        "detail_filters": []
+      }
+    ]
+  },
+  "dax_measures": [
+    {
+      "name": "Total Policies Issued",
+      "source_expression": "count([POLICY_FACT].[POLICY_ID])",
+      "aggregate_type": "count",
+      "dax_measure": "[Total Policies Issued] =\n    COUNTROWS(POLICY_FACT)",
+      "translation_method": "pattern_matched",
+      "needs_review": false
+    },
+    {
+      "name": "Total Face Amount",
+      "source_expression": "total([POLICY_FACT].[FACE_AMOUNT])",
+      "aggregate_type": "sum",
+      "dax_measure": "[Total Face Amount] =\n    SUM(FACE_AMOUNT)",
+      "translation_method": "pattern_matched",
+      "needs_review": false
+    },
+    {
+      "name": "Avg Premium",
+      "source_expression": "average([POLICY_FACT].[ANNUAL_PREMIUM])",
+      "aggregate_type": "average",
+      "dax_measure": "[Avg Premium] =\n    AVERAGE(ANNUAL_PREMIUM)",
+      "translation_method": "pattern_matched",
+      "needs_review": false
+    },
+    {
+      "name": "STP Rate",
+      "source_expression": "(count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] <= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100",
+      "aggregate_type": "calculated",
+      "dax_measure": "[STP Rate] =\n    CALCULATE(COUNTROWS(POLICY_FACT), POLICY_FACT[PROCESSING_DAYS] <= 1)",
+      "translation_method": "pattern_matched",
+      "needs_review": true
+    },
+    {
+      "name": "Rated Cases",
+      "source_expression": "count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))",
+      "aggregate_type": "calculated",
+      "dax_measure": "[Rated Cases] =\n    COUNTROWS(POLICY_FACT)",
+      "translation_method": "pattern_matched",
+      "needs_review": true
+    },
+    {
+      "name": "Policy Count",
+      "source_expression": "count([POLICY_FACT].[POLICY_ID])",
+      "aggregate_type": "count",
+      "dax_measure": "[Policy Count] =\n    COUNTROWS(POLICY_FACT)",
+      "translation_method": "pattern_matched",
+      "needs_review": false
+    },
+    {
+      "name": "Total Premium",
+      "source_expression": "total([POLICY_FACT].[ANNUAL_PREMIUM])",
+      "aggregate_type": "sum",
+      "dax_measure": "[Total Premium] =\n    SUM(ANNUAL_PREMIUM)",
+      "translation_method": "pattern_matched",
+      "needs_review": false
+    },
+    {
+      "name": "Avg Risk Score",
+      "source_expression": "average([APPLICANT_DIM].[RISK_SCORE])",
+      "aggregate_type": "average",
+      "dax_measure": "[Avg Risk Score] =\n    AVERAGE(RISK_SCORE)",
+      "translation_method": "pattern_matched",
+      "needs_review": false
+    }
+  ],
+  "dax_file_content": "// DAX Measures \u2014 Auto-generated from Cognos migration pipeline\n// Report: Life_Insurance_Underwriting_Summary\n// Generated: 2026-05-08T11:39:16.512861Z\n// Total measures: 8\n// NOTE: Measures marked [REVIEW] require manual validation before production use.\n\n// \u2500\u2500 Total Policies Issued \u2500\u2500\n// Source: count([POLICY_FACT].[POLICY_ID])\n// Translation method: pattern_matched\n[Total Policies Issued] =\n    COUNTROWS(POLICY_FACT)\n\n// \u2500\u2500 Total Face Amount \u2500\u2500\n// Source: total([POLICY_FACT].[FACE_AMOUNT])\n// Translation method: pattern_matched\n[Total Face Amount] =\n    SUM(FACE_AMOUNT)\n\n// \u2500\u2500 Avg Premium \u2500\u2500\n// Source: average([POLICY_FACT].[ANNUAL_PREMIUM])\n// Translation method: pattern_matched\n[Avg Premium] =\n    AVERAGE(ANNUAL_PREMIUM)\n\n// \u2500\u2500 STP Rate [REVIEW REQUIRED] \u2500\u2500\n// Source: (count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] <= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100\n// Translation method: pattern_matched\n[STP Rate] =\n    CALCULATE(COUNTROWS(POLICY_FACT), POLICY_FACT[PROCESSING_DAYS] <= 1)\n\n// \u2500\u2500 Rated Cases [REVIEW REQUIRED] \u2500\u2500\n// Source: count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))\n// Translation method: pattern_matched\n[Rated Cases] =\n    COUNTROWS(POLICY_FACT)\n\n// \u2500\u2500 Policy Count \u2500\u2500\n// Source: count([POLICY_FACT].[POLICY_ID])\n// Translation method: pattern_matched\n[Policy Count] =\n    COUNTROWS(POLICY_FACT)\n\n// \u2500\u2500 Total Premium \u2500\u2500\n// Source: total([POLICY_FACT].[ANNUAL_PREMIUM])\n// Translation method: pattern_matched\n[Total Premium] =\n    SUM(ANNUAL_PREMIUM)\n\n// \u2500\u2500 Avg Risk Score \u2500\u2500\n// Source: average([APPLICANT_DIM].[RISK_SCORE])\n// Translation method: pattern_matched\n[Avg Risk Score] =\n    AVERAGE(RISK_SCORE)\n",
+  "migration_notes": [
+    "7 visuals: full auto-mapping available.",
+    "2 visuals require partial manual config: ProvinceRatingCrosstab, TopPoliciesList",
+    "Date range prompts \u2192 Power BI date slicers or RLS-based date parameters. Validate fiscal calendar alignment."
+  ],
+  "validation_results": [
+    {
+      "check": "visual_mapping_coverage",
+      "status": "warn",
+      "message": "2 visual(s) have partial mapping \u2014 manual config required.",
+      "details": {
+        "partial_visuals": [
+          "ProvinceRatingCrosstab",
+          "TopPoliciesList"
+        ]
+      }
+    },
+    {
+      "check": "dax_translation_coverage",
+      "status": "warn",
+      "message": "6/8 measures auto-translated. 2 require manual review.",
+      "details": {
+        "needs_review": [
+          "STP Rate",
+          "Rated Cases"
+        ]
+      }
+    },
+    {
+      "check": "filter_prompt_alignment",
+      "status": "pass",
+      "message": "All 4 filter parameters have matching prompts.",
+      "details": {}
+    },
+    {
+      "check": "row_count_comparison",
+      "status": "stub",
+      "message": "STUB: Row count validation not executed. Would compare 0 table(s) between Cognos and Power BI dataset.",
+      "details": {
+        "tables_to_validate": [],
+        "implementation_note": "Connect to Power BI XMLA endpoint and Cognos SDK. Run SELECT COUNT(*) per table and compare."
+      }
+    },
+    {
+      "check": "measure_value_comparison",
+      "status": "stub",
+      "message": "STUB: Spot-check calculated measure values not executed. Would sample 10 policies and compare Cognos vs PBI output.",
+      "details": {
+        "implementation_note": "Requires live Cognos SDK + Power BI REST API access."
+      }
+    },
+    {
+      "check": "filter_behavior_parity",
+      "status": "stub",
+      "message": "STUB: Filter behavior parity not tested. Date range and multi-select slicers should return identical row sets.",
+      "details": {
+        "implementation_note": "Execute identical filter combinations on both systems."
+      }
+    },
+    {
+      "check": "null_handling_parity",
+      "status": "stub",
+      "message": "STUB: NULL/blank handling not validated. Cognos BLANK() vs PBI BLANK() behavior differs in some aggregations.",
+      "details": {
+        "implementation_note": "Test with known NULL records in source data."
+      }
+    }
+  ],
+  "complexity": {
+    "band": "Medium",
+    "score": 52,
+    "risk_level": "Medium",
+    "effort_estimate_hours": {
+      "low": 16,
+      "mid": 32,
+      "high": 48
+    },
+    "complexity_drivers": [
+      "Partial-support visuals (2): +10 pts",
+      "Crosstab/matrix visuals (1): +8 pts",
+      "Calculated measures (2): +8 pts",
+      "Date range filters (1): +5 pts",
+      "Multi-select filters (2): +6 pts",
+      "Multiple queries (2): +3 pts",
+      "Parameterized prompts (4): +12 pts"
+    ],
+    "unsupported_features": [],
+    "warnings": [
+      "Validate fiscal calendar alignment for date range filters."
+    ],
+    "scoring_breakdown": {
+      "total_visuals": 9,
+      "fully_mapped": 7,
+      "partially_mapped": 2,
+      "unsupported": 0,
+      "total_measures": 8,
+      "auto_translated": 8,
+      "manual_required": 0,
+      "total_filters": 3,
+      "total_prompts": 4,
+      "total_queries": 2
+    }
+  },
+  "executive_summary": {
+    "report": "Life_Insurance_Underwriting_Summary",
+    "complexity_band": "Medium",
+    "effort_range": "16\u201348 hours",
+    "recommended_effort": "32 hours",
+    "risk": "Medium",
+    "validation_summary": "1 checks passed, 0 failed",
+    "total_visuals": 9,
+    "total_measures": 8,
+    "key_risks": [
+      "Validate fiscal calendar alignment for date range filters."
+    ],
+    "unsupported_features": []
+  }
+}

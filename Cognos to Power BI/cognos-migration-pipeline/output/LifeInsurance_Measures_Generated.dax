@@ -1,0 +1,53 @@
+// DAX Measures — Auto-generated from Cognos migration pipeline
+// Report: Life_Insurance_Underwriting_Summary
+// Generated: 2026-05-08T11:39:16.512861Z
+// Total measures: 8
+// NOTE: Measures marked [REVIEW] require manual validation before production use.
+
+// ── Total Policies Issued ──
+// Source: count([POLICY_FACT].[POLICY_ID])
+// Translation method: pattern_matched
+[Total Policies Issued] =
+    COUNTROWS(POLICY_FACT)
+
+// ── Total Face Amount ──
+// Source: total([POLICY_FACT].[FACE_AMOUNT])
+// Translation method: pattern_matched
+[Total Face Amount] =
+    SUM(FACE_AMOUNT)
+
+// ── Avg Premium ──
+// Source: average([POLICY_FACT].[ANNUAL_PREMIUM])
+// Translation method: pattern_matched
+[Avg Premium] =
+    AVERAGE(ANNUAL_PREMIUM)
+
+// ── STP Rate [REVIEW REQUIRED] ──
+// Source: (count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] <= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100
+// Translation method: pattern_matched
+[STP Rate] =
+    CALCULATE(COUNTROWS(POLICY_FACT), POLICY_FACT[PROCESSING_DAYS] <= 1)
+
+// ── Rated Cases [REVIEW REQUIRED] ──
+// Source: count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))
+// Translation method: pattern_matched
+[Rated Cases] =
+    COUNTROWS(POLICY_FACT)
+
+// ── Policy Count ──
+// Source: count([POLICY_FACT].[POLICY_ID])
+// Translation method: pattern_matched
+[Policy Count] =
+    COUNTROWS(POLICY_FACT)
+
+// ── Total Premium ──
+// Source: total([POLICY_FACT].[ANNUAL_PREMIUM])
+// Translation method: pattern_matched
+[Total Premium] =
+    SUM(ANNUAL_PREMIUM)
+
+// ── Avg Risk Score ──
+// Source: average([APPLICANT_DIM].[RISK_SCORE])
+// Translation method: pattern_matched
+[Avg Risk Score] =
+    AVERAGE(RISK_SCORE)

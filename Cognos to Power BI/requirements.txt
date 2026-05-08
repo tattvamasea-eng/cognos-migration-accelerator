@@ -1,0 +1,9 @@
+# Cognos → Power BI Migration Pipeline
+# Python 3.11+ required
+# All pipeline dependencies are Python stdlib — no pip installs needed.
+# xml.etree.ElementTree, json, pathlib, argparse, re, dataclasses, datetime
+# are all built-in.
+
+# Optional: install only if adding FastAPI backend wrapper
+# fastapi>=0.110.0
+# uvicorn>=0.29.0
