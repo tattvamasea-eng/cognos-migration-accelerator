@@ -70,7 +70,7 @@ cognos-migration-accelerator/
 
 **1. Clone**
 ```bash
-git clone https://github.com/your-org/cognos-migration-accelerator.git
+git clone https://github.com/tattvamasea-eng/cognos-migration-accelerator.git
 cd cognos-migration-accelerator
 ```
 
