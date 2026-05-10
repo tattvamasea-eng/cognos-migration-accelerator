@@ -1,8 +1,30 @@
 This file provides guidance when working with code in this repository. The README.md should ALWAYS serve as an accurate, comprehensive piece of documentation for this project. It should describe the broader goals and purpose of this repository along with the technical implementation details. If any aspect of the project changes, the README.md should be updated to reflect that.
 
-# Project Notes
+# Cognos → Power BI Migration Accelerator
+### Proof of Concept | Life Insurance Practice
 
-<!-- Documentation for this specific project goes here. This will include both an articulation of what this project aims to accomplish as well as technical details about how it works. This means explaining the purpose of the project as a whole along with an overview of the design choices. -->
+Live demo of the Cognos-to-Power BI migration tool. Two interactive apps:
+
+- **/** — 3-tab demo: Complexity Scorer, Migration Pipeline simulator, Power BI Report Preview
+- **/scorer** — Standalone dark-mode complexity scorer with SVG gauge, detailed scoring model, JSON export
+
+**Stack:** Bun + Hono + React + Vite + Tailwind CSS + recharts
+**Source:** https://github.com/tattvamasea-eng/cognos-migration-accelerator
+**Python Pipeline:** Available in `pipeline/` — runs end-to-end against mock Cognos XML
+
+## Architecture
+
+This is a Zo Site with the original GitHub repo's React frontend adapted to the Zo Site framework. The Python pipeline (`pipeline/`) is included for reference but not wired to the UI (the Migrate tab is simulated).
+
+### Pages
+- `src/pages/cognos-demo.tsx` — Main 3-tab demo (Score | Migrate | Preview)
+- `src/pages/complexity-scorer.tsx` — Standalone dark-mode scorer with detailed weighting model
+
+### Key Differences from GitHub Repo
+- Adapted to TypeScript + Zo Site routing (react-router-dom)
+- Removed global body styles to avoid clashing with Zo Site shell
+- Added cross-navigation between the two scoring tools
+- Python pipeline included in `pipeline/` directory for reference
 
 ---
 

@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import BlankDemo from "./pages/blank-demo";
+import CognosDemo from "./pages/cognos-demo";
+import ComplexityScorer from "./pages/complexity-scorer";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export default function App() {
@@ -7,7 +8,8 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<BlankDemo />} />
+          <Route path="/" element={<CognosDemo />} />
+          <Route path="/scorer" element={<ComplexityScorer />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
