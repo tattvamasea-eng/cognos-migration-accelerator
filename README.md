@@ -1,225 +1,488 @@
-# Cognos → Power BI Migration Accelerator
-### Proof of Concept | Life Insurance Practice
+This file provides guidance when working with code in this repository. The README.md should ALWAYS serve as an accurate, comprehensive piece of documentation for this project. It should describe the broader goals and purpose of this repository along with the technical implementation details. If any aspect of the project changes, the README.md should be updated to reflect that.
 
-> **GitHub Source:** https://github.com/tattvamasea-eng/cognos-migration-accelerator
+# Project Notes
 
-This project automates IBM Cognos Analytics report migration to Microsoft Power BI. It parses a Cognos XML report spec, generates a canonical Intermediate Representation (IR), applies rule-based visual mapping and DAX translation, scores migration complexity, and validates output — all in a single `python main.py` run.
-
----
-
-## Live Demo
-
-**Zo Preview (authenticated, you only):**
-- Open `file '/home/workspace/cognos-migration-accelerator'` in the Zo app → click the preview iframe
-- Or visit: `https://zite-54924-{host}.zo.computer` (shown in Zo UI)
-
-**Routes:**
-
-| Route | Description |
-|-------|-------------|
-| `/` | **5-step wizard** — Upload → Extract → Score → Migrate → Preview |
-| `/scorer` | **Standalone dark-mode scorer** — SVG gauge, per-item counting, JSON export |
-
-**For external audiences:** Click the **Publish** button in the Zo UI toolbar. This creates a public URL (e.g., `https://cognos-migration-accelerator-tattvamasi.zocomputer.io`).
-
-> **Note:** A platform-side sandbox issue prevents programmatic publishing via the `publish_site` tool. Use the Zo UI Publish button instead.
+<!-- Documentation for this specific project goes here. This will include both an articulation of what this project aims to accomplish as well as technical details about how it works. This means explaining the purpose of the project as a whole along with an overview of the design choices. -->
 
 ---
 
-## What's New (vs. Original GitHub Repo)
+# Documentation
 
-| Change | Before | After |
-|--------|--------|-------|
-| **Demo flow** | 3 isolated tabs (Score / Migrate / Preview) | 5-step wizard with logical progression |
-| **Entry point** | Starts at Score tab | Starts at Upload step with drag-and-drop |
-| **Scoring** | Form-based (numVisuals, numQueries, dropdowns) | Per-item counting (8 visual types × count, 5 calc types × count, 4 filter types × count) |
-| **Visual design** | Light theme, basic styling | Dark theme, SVG gauge, mapping legend, sticky score panel |
-| **Cross-navigation** | None | Link between main wizard and standalone scorer |
-| **Report intake** | None — user had to imagine the report | Animated extraction simulation with mock data |
-| **JSON export** | Button that did nothing | Working file download with full payload |
-| **Pipeline wiring** | Fully simulated (frontend only) | Still simulated — FastAPI backend not yet built |
-
----
-
-## Completion Status
-
-### ✅ Done (working code)
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **Python Pipeline** | ✅ Complete | `extractor.py` → `ir_generator.py` → `rule_engine.py` → `validator.py` → `complexity_scorer.py`. Runs end-to-end against mock XML. |
-| **XPath XML Parser** | ✅ Complete | Extracts metadata, data sources, queries, visuals, filters, prompts across 5 extraction zones |
-| **Canonical IR** | ✅ Complete | Decouples Cognos from PBI. Normalized visuals, filters, calculations, data fields |
-| **Visual Mapping Rules** | ✅ Complete | 9 Cognos types → Power BI equivalents (bar→clusteredBarChart, crosstab→matrix, etc.) |
-| **DAX Translation** | ✅ Complete | 8 regex patterns + aggregate stubs. Generates `.dax` file with review flags |
-| **Complexity Scorer (Python)** | ✅ Complete | Weighted scoring: visuals (5–15 pts), calcs (4–8 pts), filters (3–5 pts), prompts (3 pts). Low/Medium/High bands with hour estimates |
-| **Validation Engine** | ⚠️ Partial | 3 live checks (visual mapping, DAX coverage, filter alignment) + 4 stubs (row count, measure values, filter parity, NULL handling) |
-| **Frontend — Upload Step** | ✅ Complete | Drag-and-drop zone, demo report loader, validation |
-| **Frontend — Extract Step** | ✅ Complete | Animated extraction simulation with real mock data |
-| **Frontend — Score Step** | ✅ Complete | Per-item counting, SVG gauge, effort bars, score drivers, unsupported features warning, JSON export |
-| **Frontend — Migrate Step** | ✅ Complete | Animated 5-step pipeline simulation, JSON/DAX output tabs, summary stats |
-| **Frontend — Preview Step** | ✅ Complete | 5-page Power BI replica: Executive Summary, Underwriting, Claims, Portfolio, Compliance |
-| **Standalone Scorer** | ✅ Complete | Dark-mode page with detailed weighting model, mapping legend, reset/export |
-| **Sample XML** | ✅ Complete | `sample-cognos-report.xml` — Life Insurance Underwriting Summary with 9 visuals, 2 queries, 4 prompts |
-
-### 🔧 Stubbed / Partial
-
-| Component | Status | What's Missing | Effort to Complete |
-|-----------|--------|----------------|-------------------|
-| **Validator — Row Count** | Stub | Compare Cognos vs PBI dataset row counts via XMLA endpoint | 16–24h |
-| **Validator — Measure Values** | Stub | Spot-check calculated measure values across both systems | 8–12h |
-| **Validator — Filter Parity** | Stub | Verify identical filter combinations return same row sets | 8–12h |
-| **Validator — NULL Handling** | Stub | Test Cognos BLANK() vs PBI BLANK() behavior | 4–8h |
-| **DAX Translation (AI-assisted)** | Partial | Regex patterns handle simple cases; complex actuarial/nested expressions need Claude API | 24–40h |
-| **Frontend ↔ Backend Wiring** | Not built | Migrate tab is pure simulation. Needs FastAPI `/run-pipeline` endpoint | 8–12h |
-| **Real XML Upload Processing** | Not built | Upload step reads file client-side only. Needs API to run Python pipeline | 8–12h |
-| **.pbix File Generation** | Not built | Generate actual Power BI Desktop file from IR | 32–48h |
-| **RLS + PIPEDA Masking** | Not built | Row-level security aligned to client's data access matrix | 16–24h |
-| **Batch Processing** | Not built | Process 50+ reports in parallel | 16–24h |
-| **Azure Deployment (IaC)** | Not built | Terraform/Bicep for client environment | 24–32h |
-| **Tests** | None | No pytest, no unit tests, no CI/CD | 16–24h |
-| **FastAPI Wrapper** | Not built | REST API for frontend to call pipeline stages | 8–12h |
-
----
-
-## Remaining Work to Production
-
-| Priority | Item | Effort | Why It Matters |
-|----------|------|--------|---------------|
-| 🟡 **Do First** | FastAPI wrapper + frontend wiring | 8–12h | Converts simulation into real pipeline execution |
-| 🟡 **Do First** | Real XML upload → pipeline execution | 8–12h | User drops a file, gets real output |
-| 🔴 **High** | `.pbix` file generation | 32–48h | Key client deliverable — tangible output |
-| 🔴 **High** | RLS + PIPEDA masking | 16–24h | Required for production in Canadian life insurance |
-| 🟡 **Medium** | Live validator (XMLA endpoint) | 16–24h | Highest-value production task — proves correctness |
-| 🟡 **Medium** | Full DAX translation (Claude API) | 24–40h | Handles complex actuarial expressions regex can't touch |
-| 🟡 **Medium** | Azure deployment (IaC) | 24–32h | Client needs Canada Central / Canada East regions |
-| 🟡 **Medium** | Batch processing (50+ reports) | 16–24h | Scale from single report to portfolio migration |
-| 🟢 **Lower** | Tests + CI/CD | 16–24h | pytest, GitHub Actions, code quality gates |
-
-**Total: 168–256 developer hours to production** (excludes client environment setup, security review, and UAT)
-
----
+This is a **Zo Site** - a web application running on a user's Zo computer that combines:
+- **Backend**: Bun + Hono server with API routes
+- **Frontend**: React + Vite with client-side routing, shadcn/ui components, and Tailwind CSS 4
+- **Single Process**: Vite runs in middleware mode (no separate dev server)
 
 ## Architecture
 
-### Pipeline Flow (Python)
+### File Structure
 
 ```
-Cognos XML Report
-       ↓
-  [extractor.py]      ← XPath parser (5 zones: metadata, queries, visuals, filters, prompts)
-       ↓
-  [ir_generator.py]   ← Canonical IR (normalized visuals, filters, calcs, fields)
-       ↓
-  [rule_engine.py]    ← Visual mapping (9 types → PBI) + DAX translation (8 patterns)
-       ↓
-  [complexity_scorer.py] ← Weighted scoring (0–100) + effort estimate (hours)
-       ↓
-  [validator.py]      ← 3 live checks + 4 stubs (row count, measures, filters, NULLs)
-       ↓
-  Output: migration_result.json + LifeInsurance_Measures_Generated.dax
+.
+├── server.ts              # Main server (Hono + Vite middleware)
+├── index.html             # HTML entry point for React
+├── vite.config.ts         # Vite configuration
+├── package.json           # Dependencies and scripts
+├── zosite.json            # Zo deployment config (ports, env vars)
+├── public/                # Static assets (images, fonts, favicon)
+│   ├── favicon.svg        # Site favicon (replace with your own)
+│   └── images/
+│       └── pegasus.png    # Example image (loaded via <img src="/images/pegasus.png">)
+├── backend-lib/
+│   └── zo-api.ts         # Helper for calling Zo API
+└── src/
+    ├── main.tsx          # React entry point
+    ├── App.tsx           # Router setup
+    ├── styles.css        # Global styles
+    └── pages/            # Page components
 ```
 
-### Frontend Flow (React)
+### Development vs Production
 
-```
-Step 1: Upload    → Drag/drop XML or load demo report
-Step 2: Extract   → Animated metadata extraction (simulated)
-Step 3: Score     → Per-item complexity scoring with live gauge
-Step 4: Migrate   → Animated pipeline simulation with JSON/DAX output
-Step 5: Preview   → 5-page Power BI replica with life insurance data
-```
+**Development Mode** (`bun run dev`):
+- Single Bun process running `server.ts`
+- Vite in middleware mode transforms files on-the-fly
+- API routes: `/api/*` handled by Hono
+- React app: served via Vite transforms (HMR disabled, use `bun --hot` for server restart)
+- Client-side routing: any non-API, non-file route falls back to `index.html`
+- **Environment**: Site runs at an internal authenticated URL accessible only to you (private site on your Zo computer)
 
-### Tech Stack
+**Production Mode** (`bun run prod`):
+- Builds React app to `dist/` using Vite
+- Bun serves static files from `dist/` via `hono/bun` serveStatic
+- API routes still handled by Hono
+- SPA fallback: all non-API routes serve `dist/index.html`
+- **Environment**: Site is published and accessible to anyone on the internet at a public URL
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python 3.11 (pipeline) / Bun + Hono (Zo Site server) |
-| Frontend | React 18 + TypeScript + Vite |
-| Styling | Tailwind CSS 4 + inline styles (demo pages) |
-| Charts | recharts (Preview tab) / CSS bar charts (Score tab) |
-| Build | Vite (bundling) + Zo Site (hosting) |
+NEVER use the scripts `bun run dev` or `bun run prod`. The Zo system handles running the site in the correct mode based on context. All process management of the server is handled by Zo. Never restart or stop the server manually.
 
----
+## Viewing, Verification, and Debugging (agent-browser)
 
-## Folder Structure
+The `agent-browser` CLI tool lets you preview, navigate, and debug the site running at `http://localhost:$PORT` (PORT is set by Zo). Use it to verify UI changes, debug routing, or capture screenshots.
 
-```
-cognos-migration-accelerator/
-├── src/
-│   ├── pages/
-│   │   ├── cognos-demo.tsx      ← 5-step wizard (Upload→Extract→Score→Migrate→Preview)
-│   │   └── complexity-scorer.tsx ← Standalone dark-mode scorer
-│   ├── App.tsx                   ← Router: / and /scorer
-│   └── ...
-├── pipeline/
-│   ├── pipeline/
-│   │   ├── extractor.py          ← Stage 1: XPath Cognos XML parser
-│   │   ├── ir_generator.py       ← Stage 2: Canonical IR generator
-│   │   ├── rule_engine.py        ← Stage 3: Visual + DAX rule engine
-│   │   ├── validator.py          ← Stage 4: 7-check QA validation (3 live, 4 stubs)
-│   │   ├── complexity_scorer.py  ← Stage 5: Weighted complexity scorer
-│   │   ├── main.py               ← Entry point: python main.py --xml <file> --output <file>
-│   │   └── mock_cognos_report.xml ← Synthetic UW Summary report input
-│   └── output/
-│       ├── migration_result.json ← Generated by pipeline run
-│       └── LifeInsurance_Measures_Generated.dax
-├── sample-cognos-report.xml      ← Standalone sample XML for testing
-├── server.ts                     ← Hono + Vite middleware (Zo Site)
-├── index.html                    ← HTML entry point
-├── package.json                  ← Dependencies (React, recharts, etc.)
-└── zosite.json                   ← Zo deployment config
-```
+Core workflow:
+1. Navigate to the site:
+   ```bash
+   agent-browser open http://localhost:$PORT
+   ```
+2. Snapshot the page to get interactive element refs:
+   ```bash
+   agent-browser snapshot -i
+   ```
+3. Interact with elements:
+   ```bash
+   agent-browser click @e1
+   agent-browser fill @e2 "text"
+   agent-browser hover @e3
+   agent-browser get text @e1
+   ```
+4. Re-snapshot after page changes to get updated refs.
 
----
-
-## Running the Python Pipeline
-
+Taking screenshots:
 ```bash
-cd pipeline/pipeline
-python3 main.py --xml mock_cognos_report.xml --output ../output/migration_result.json
+agent-browser screenshot
+agent-browser screenshot --full-page
+agent-browser screenshot --filename debug.png
 ```
 
-Or use the sample file:
-
+For the full list of commands and options, run:
 ```bash
-python3 main.py --xml ../../sample-cognos-report.xml --output ../output/migration_result.json
+agent-browser --help
 ```
 
-Output files appear in `pipeline/output/`.
+Note: Do not tell the user to visit localhost; they already have access via the Zo preview iframe.
 
----
+## Key Technologies
 
-## Running the Frontend (Local Dev)
+### ⚠️ IMPORTANT: This is BUN + HONO (NOT Node.js + Express)
 
-```bash
-bun run dev
+This application uses:
+- **Bun** as the runtime (NOT Node.js)
+- **Hono** as the web framework (NOT Express)
+
+Do not use Express patterns. Use Hono equivalents. For file system operations, see the section below.
+
+### Bun Runtime
+- JavaScript runtime (NOT Node.js or Deno)
+- Use `bun add <package>` to install dependencies
+- Built-in TypeScript support
+- Built-in SQLite via `import { Database } from "bun:sqlite"`
+- Process spawning: `Bun.spawn()` for running commands
+
+### File System Operations
+
+Bun has native APIs for file I/O but uses Node.js APIs for directory operations. Use the correct API for each operation:
+
+| Operation | API | Example |
+|-----------|-----|---------|
+| Read file | `Bun.file()` | `await Bun.file("data.json").text()` |
+| Write file | `Bun.write()` | `await Bun.write("out.txt", content)` |
+| File exists | `Bun.file().exists()` | `await Bun.file("x.txt").exists()` |
+| Read directory | `node:fs/promises` | `await readdir("./posts")` |
+| Create directory | `node:fs/promises` | `await mkdir("dir", { recursive: true })` |
+| Glob files | `Bun Glob` | `new Glob("**/*.md").scan(".")` |
+
+**⚠️ Common Mistakes to Avoid:**
+
+```ts
+// ❌ WRONG - These do NOT exist:
+Bun.readdir()        // No such API
+Bun.readdirSync()    // No such API
+Bun.mkdir()          // No such API
+fs.readFileSync()    // Works but slower than Bun.file()
+
+// ✅ CORRECT patterns:
+import { readdir, mkdir } from "node:fs/promises";
+
+// Reading a file
+const content = await Bun.file("config.json").json();
+
+// Writing a file
+await Bun.write("output.txt", "Hello");
+
+// Listing directory contents
+const files = await readdir("./posts");
+
+// Creating a directory
+await mkdir("./uploads", { recursive: true });
+
+// Finding files by pattern
+import { Glob } from "bun";
+const glob = new Glob("**/*.md");
+for await (const file of glob.scan("./posts")) {
+  console.log(file);
+}
 ```
 
-The Zo Site dev server starts automatically. View in the Zo preview iframe.
+### Hono Framework
+- Lightweight web framework designed for Bun
+- Documentation: https://honojs.dev/llms-small.txt
+- Import from `hono` for core, `hono/bun` for Bun-specific features like `serveStatic`
 
----
+**Serving Static Files (Bun-specific):**
 
-## Regulatory Notes
+```ts
+import { serveStatic } from 'hono/bun'
 
-- **OSFI B-20 / E-21:** Rule engine and scorer are models under OSFI definition. Governance documentation required before production use in underwriting decisions.
-- **PIPEDA:** Pipeline IR contains field names only — no PII values. Azure deployment must use Canada Central or Canada East regions.
-- **RLS:** Power BI output must implement row-level security aligned to the client's data access matrix.
-- **Claude API:** If AI-assisted DAX translation is enabled, confirm client AI use policy and Anthropic data processing addendum.
+app.use('/static/*', serveStatic({ root: './' }))
+app.use('/favicon.ico', serveStatic({ path: './favicon.ico' }))
+app.get('*', serveStatic({ path: './static/fallback.txt' }))
 
----
+// You can reach outside the project root to files in the user's workspace
+app.get('/workspace-file', serveStatic({ path: '../some/dir/file.txt' }))
+app.get('/absolute-file', serveStatic({ path: '/home/user/file.txt' }))
 
-## Key Extension Points
+// Custom MIME types
+app.get('/media/*', serveStatic({
+  mimes: {
+    m3u8: 'application/vnd.apple.mpegurl',
+    ts: 'video/mp2t',
+  },
+}))
+```
 
-| File | How to Extend |
-|------|---------------|
-| `rule_engine.py` → `VISUAL_MAP` | Add new Cognos → Power BI visual type mappings |
-| `rule_engine.py` → `DAX_PATTERNS` | Add new DAX translation patterns |
-| `complexity_scorer.py` → `WEIGHTS` | Tune scoring weights against your report inventory |
-| `validator.py` → `_check_row_count_stub()` | Replace stub with live XMLA endpoint call — highest-value production task |
+**Hono Routing:**
 
----
+```ts
+// REST API endpoints
+app.get('/', (c) => c.json({ items: [] }))
+app.post('/', (c) => c.json({ created: true }, 201))
+app.get('/:id', (c) => c.json({ id: c.req.param('id') }))
 
-## License
+// Middleware
+import { basicAuth } from 'hono/basic-auth'
+app.use('/admin/*', basicAuth({ username: 'admin', password: 'secret' }))
 
-Internal POC — not licensed for external distribution.
+// Multiple middlewares are processed in order
+app.use(logger())
+app.use('/posts/*', cors())
+app.post('/posts/*', basicAuth())
+```
+
+### React + Vite
+- React for UI components
+- Vite handles bundling and transforms
+- Dependencies installed via `bun add` (NOT CDN imports) - all packages bundled by Vite
+- React Router for client-side routing
+- **Styling**: Tailwind CSS 4 configured with `@tailwindcss/vite` plugin
+- **UI Components**: shadcn/ui already set up and configured - components can be added via `bunx shadcn@latest add <component-name>`
+- **Icons**: Lucide React icons included and ready to use
+
+## Common Tasks
+
+### Adding API Routes
+
+Add routes in `server.ts` before the Vite middleware:
+
+```ts
+app.get("/api/example", async (c) => {
+  return c.json({ data: "example" });
+});
+```
+
+### Adding React Components
+
+Create components in `src/`:
+
+```tsx
+// src/components/MyComponent.tsx
+import React from "react";
+
+export default function MyComponent() {
+  return <div>Hello</div>;
+}
+```
+
+Add routes in `src/App.tsx`:
+
+```tsx
+import MyPage from "./pages/MyPage";
+
+<Routes>
+  <Route path="/my-page" element={<MyPage />} />
+</Routes>
+```
+
+### Calling Zo API from Backend
+
+Use the helper in `backend-lib/zo-api.ts`:
+
+```ts
+import { callZo } from "./backend-lib/zo-api";
+
+app.post("/api/ask-zo", async (c) => {
+  const { question } = await c.req.json();
+
+  const result = await callZo(question, {
+    outputFormat: {
+      type: "object",
+      properties: { answer: { type: "string" } },
+      required: ["answer"]
+    }
+  });
+
+  return c.json(result);
+});
+```
+
+### Static Assets
+
+There are two ways to include static assets like images, fonts, or JSON data:
+
+#### Option 1: The `public/` Folder (Recommended for Most Cases)
+
+Place files in the `public/` directory. They're served at the root URL path and work identically in dev and production.
+
+```
+public/
+├── favicon.svg
+├── images/
+│   ├── logo.png
+│   └── hero.jpg
+├── fonts/
+│   └── custom.woff2
+└── og-image.jpg
+```
+
+Reference them with absolute paths:
+
+```tsx
+<img src="/images/logo.png" alt="Logo" />
+<link rel="icon" href="/favicon.svg" />
+```
+
+In production, Vite copies the `public/` folder contents to `dist/` automatically.
+
+**Use `public/` for**: favicons, Open Graph images, downloadable files, fonts, any asset that needs a stable/predictable URL.
+
+#### Option 2: Import in Components (Bundled Assets)
+
+Import assets directly in your React components. Vite handles bundling, optimization, and cache-busting via content hashes.
+
+```tsx
+// Images
+import heroImage from '@/assets/hero.png';
+
+function Hero() {
+  return <img src={heroImage} alt="Hero" />;
+}
+
+// JSON data
+import config from '@/data/config.json';
+
+function Settings() {
+  return <div>App version: {config.version}</div>;
+}
+
+// SVG as component (with ?react suffix)
+import Logo from '@/assets/logo.svg?react';
+
+function Header() {
+  return <Logo className="h-8 w-8" />;
+}
+```
+
+Place imported assets in `src/assets/` or alongside components:
+
+```
+src/
+├── assets/
+│   ├── hero.png
+│   └── logo.svg
+├── data/
+│   └── config.json
+└── components/
+    └── Header.tsx
+```
+
+**Use imports for**: component-specific images, icons used in JSX, JSON configuration, any asset that benefits from bundling/tree-shaking.
+
+#### Serving Files from the Workspace
+
+For files outside the project (e.g., user's workspace files), create an API route:
+
+```ts
+app.get("/myfile", async (c) => {
+  const file = Bun.file("/path/to/file");
+  return new Response(file);
+});
+```
+
+### Database
+
+This application is database-agnostic and doesn't include a database by default. For most use cases, SQLite is recommended.
+
+**Using Bun's Built-in SQLite:**
+
+```ts
+import { Database } from "bun:sqlite";
+
+// Create/open database
+const db = new Database("mydb.sqlite");
+
+// Create table
+db.run(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE
+  )
+`);
+
+// Insert data
+const insert = db.prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+insert.run("John Doe", "john@example.com");
+
+// Query data
+const query = db.query("SELECT * FROM users WHERE name = ?");
+const users = query.all("John Doe");
+
+// Close when done
+db.close();
+```
+
+**In a Hono route:**
+
+```ts
+app.get("/api/users", (c) => {
+  const db = new Database("mydb.sqlite");
+  const users = db.query("SELECT * FROM users").all();
+  db.close();
+  return c.json({ users });
+});
+
+app.post("/api/users", async (c) => {
+  const { name, email } = await c.req.json();
+  const db = new Database("mydb.sqlite");
+
+  try {
+    const insert = db.prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+    insert.run(name, email);
+    db.close();
+    return c.json({ success: true }, 201);
+  } catch (error) {
+    db.close();
+    return c.json({ error: "Failed to create user" }, 400);
+  }
+});
+```
+
+## Scripts
+
+- `bunx tsc --noEmit` - Type check
+
+## Important Notes
+
+### Server-Side vs Client-Side
+
+- **Server code**: `server.ts`, `backend-lib/` - runs on Bun
+- **Client code**: `src/` - runs in browser, bundled by Vite
+- Install ALL dependencies via `bun add` (React, etc.) - Vite bundles them
+
+### Environment Variables
+
+- `NODE_ENV=production` switches to production mode
+- `ZO_CLIENT_IDENTITY_TOKEN` required for calling Zo API
+- Access server vars via `process.env.VAR_NAME` in server code
+- Access client vars prefixed with `VITE_` via `import.meta.env.VITE_VAR_NAME` in React code
+
+### File System Access
+
+The server runs on the user's Zo computer and can:
+- Read/write any file on the system
+- Execute commands via `Bun.spawn()`
+- Access local databases
+
+### Configuration
+
+`zosite.json` defines:
+```json
+{
+  "name": "My Site",
+  "local_port": 12345,
+  "entrypoint": "bun run dev",
+  "publish": {
+    "label": "My Site",
+    "type": "http",
+    "entrypoint": "bun run prod",
+    "published_port": 12346,
+    "env": {
+      "NODE_ENV": "production",
+      "ZO_CLIENT_IDENTITY_TOKEN": "none"
+    }
+  }
+}
+```
+
+- Top-level `env`: Environment variables for **development mode**
+- `publish.env`: Environment variables for **production mode**
+- Variables prefixed with `VITE_` are exposed to client-side code via Vite
+- `PORT` environment variable is automatically set to match `local_port` (or `published_port` in production)
+
+### ⚠️ IMPORTANT: Do Not Edit `zosite.json` System Fields
+
+**The `zosite.json` file is auto-generated by Zo. Most fields should not be manually edited.**
+
+- `local_port` and `published_port` are assigned by the system when the site is created
+- Ports are chosen using a hash-based algorithm to avoid conflicts
+- The Zo system manages process lifecycle, tunneling, and URL routing based on these ports
+- Editing ports or entrypoints will break the site's preview URL and publish functionality
+
+**Safe to edit:**
+- `name` - The display name for the site
+- `env` and `publish.env` - Add or modify environment variables as needed
+
+**Never edit:**
+- `local_port`, `published_port` - System-assigned ports
+- `entrypoint`, `publish.entrypoint` - Managed startup commands
+- `label`, `type` - Service configuration
+
+**Private vs Public Access:**
+- **Private (default)**: Sites run in dev mode behind authentication. Only you can access them via the preview iframe in Zo. This is the normal development experience.
+- **Public (published)**: Publishing creates a shareable URL that anyone on the internet can access without authentication.
+
+To publish your site publicly, use the **Publish button** in the Zo UI or explicitly ask Zo to publish it (e.g., "publish this site", "make it public").
+
+## Deployment
+
+The site exports `{ fetch, port }` from `server.ts` for Zo's deployment system. The same code runs in both dev and production - mode is controlled by `NODE_ENV`.
