@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://developer.cognos.com/schemas/report/14.1/"
+        name="Life_Insurance_Underwriting_Summary"
+        reportVersion="1.0">
+
+  <metadata>
+    <author>UW Analytics Team</author>
+    <createdDate>2023-06-01</createdDate>
+    <lastModified>2024-01-15</lastModified>
+    <dataSource>UW_DW_PROD</dataSource>
+    <subject>Monthly Underwriting Performance</subject>
+  </metadata>
+
+  <dataSources>
+    <dataSource name="UW_DW_PROD">
+      <querySubject name="POLICY_FACT">
+        <queryItem name="POLICY_ID" dataType="varchar"/>
+        <queryItem name="ISSUE_DATE" dataType="date"/>
+        <queryItem name="FACE_AMOUNT" dataType="decimal"/>
+        <queryItem name="ANNUAL_PREMIUM" dataType="decimal"/>
+        <queryItem name="RATING_CLASS" dataType="varchar"/>
+        <queryItem name="TABLE_RATING" dataType="integer"/>
+        <queryItem name="FLAT_EXTRA" dataType="decimal"/>
+        <queryItem name="UNDERWRITER_ID" dataType="varchar"/>
+        <queryItem name="DECISION" dataType="varchar"/>
+        <queryItem name="PROCESSING_DAYS" dataType="integer"/>
+      </querySubject>
+      <querySubject name="APPLICANT_DIM">
+        <queryItem name="APPLICANT_ID" dataType="varchar"/>
+        <queryItem name="AGE_AT_ISSUE" dataType="integer"/>
+        <queryItem name="GENDER" dataType="varchar"/>
+        <queryItem name="SMOKER_STATUS" dataType="varchar"/>
+        <queryItem name="PROVINCE" dataType="varchar"/>
+        <queryItem name="RISK_SCORE" dataType="decimal"/>
+        <queryItem name="PACK_YEARS" dataType="decimal"/>
+      </querySubject>
+      <querySubject name="MIB_CHECK_DIM">
+        <queryItem name="MIB_CODE" dataType="varchar"/>
+        <queryItem name="MIB_FLAG" dataType="boolean"/>
+        <queryItem name="APS_REQUIRED" dataType="boolean"/>
+        <queryItem name="MVR_REQUIRED" dataType="boolean"/>
+      </querySubject>
+    </dataSource>
+  </dataSources>
+
+  <queries>
+    <query name="MainQuery">
+      <selection>
+        <dataItem name="Policy ID" expression="[POLICY_FACT].[POLICY_ID]"/>
+        <dataItem name="Issue Date" expression="[POLICY_FACT].[ISSUE_DATE]"/>
+        <dataItem name="Face Amount" expression="[POLICY_FACT].[FACE_AMOUNT]"/>
+        <dataItem name="Annual Premium" expression="[POLICY_FACT].[ANNUAL_PREMIUM]"/>
+        <dataItem name="Rating Class" expression="[POLICY_FACT].[RATING_CLASS]"/>
+        <dataItem name="Table Rating" expression="[POLICY_FACT].[TABLE_RATING]"/>
+        <dataItem name="Flat Extra" expression="[POLICY_FACT].[FLAT_EXTRA]"/>
+        <dataItem name="Decision" expression="[POLICY_FACT].[DECISION]"/>
+        <dataItem name="Processing Days" expression="[POLICY_FACT].[PROCESSING_DAYS]"/>
+        <dataItem name="Applicant Age" expression="[APPLICANT_DIM].[AGE_AT_ISSUE]"/>
+        <dataItem name="Smoker Status" expression="[APPLICANT_DIM].[SMOKER_STATUS]"/>
+        <dataItem name="Province" expression="[APPLICANT_DIM].[PROVINCE]"/>
+        <dataItem name="Risk Score" expression="[APPLICANT_DIM].[RISK_SCORE]"/>
+        <dataItem name="Pack Years" expression="[APPLICANT_DIM].[PACK_YEARS]"/>
+        <dataItem name="MIB Flag" expression="[MIB_CHECK_DIM].[MIB_FLAG]"/>
+        <dataItem name="APS Required" expression="[MIB_CHECK_DIM].[APS_REQUIRED]"/>
+        <dataItem name="Total Policies Issued"
+                  expression="count([POLICY_FACT].[POLICY_ID])"
+                  aggregate="count"/>
+        <dataItem name="Total Face Amount"
+                  expression="total([POLICY_FACT].[FACE_AMOUNT])"
+                  aggregate="sum"/>
+        <dataItem name="Avg Premium"
+                  expression="average([POLICY_FACT].[ANNUAL_PREMIUM])"
+                  aggregate="average"/>
+        <dataItem name="STP Rate"
+                  expression="(count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[PROCESSING_DAYS] &lt;= 1)) / count([POLICY_FACT].[POLICY_ID])) * 100"
+                  aggregate="calculated"/>
+        <dataItem name="Rated Cases"
+                  expression="count(filter([POLICY_FACT].[POLICY_ID], [POLICY_FACT].[TABLE_RATING] > 0 or [POLICY_FACT].[FLAT_EXTRA] > 0))"
+                  aggregate="calculated"/>
+      </selection>
+      <detailFilters>
+        <detailFilter>
+          <filterExpression>[POLICY_FACT].[ISSUE_DATE] between ?StartDate? and ?EndDate?</filterExpression>
+        </detailFilter>
+        <detailFilter>
+          <filterExpression>[POLICY_FACT].[DECISION] in ('Approved', 'Rated', 'Declined', 'Postponed')</filterExpression>
+        </detailFilter>
+      </detailFilters>
+      <sortList>
+        <sortItem name="Issue Date" order="descending"/>
+      </sortList>
+    </query>
+
+    <query name="ProvinceBreakdown">
+      <selection>
+        <dataItem name="Province" expression="[APPLICANT_DIM].[PROVINCE]"/>
+        <dataItem name="Policy Count" expression="count([POLICY_FACT].[POLICY_ID])" aggregate="count"/>
+        <dataItem name="Total Premium" expression="total([POLICY_FACT].[ANNUAL_PREMIUM])" aggregate="sum"/>
+        <dataItem name="Avg Risk Score" expression="average([APPLICANT_DIM].[RISK_SCORE])" aggregate="average"/>
+      </selection>
+    </query>
+  </queries>
+
+  <layout>
+    <reportPages>
+      <page name="Page1">
+        <pageBody>
+
+          <!-- KPI Cards -->
+          <textItem name="TotalPoliciesKPI">
+            <dataSource>Total Policies Issued</dataSource>
+            <type>kpi</type>
+            <label>Total Policies Issued</label>
+          </textItem>
+          <textItem name="TotalFaceAmountKPI">
+            <dataSource>Total Face Amount</dataSource>
+            <type>kpi</type>
+            <label>Total Face Amount ($)</label>
+          </textItem>
+          <textItem name="STPRateKPI">
+            <dataSource>STP Rate</dataSource>
+            <type>kpi</type>
+            <label>STP Rate (%)</label>
+          </textItem>
+          <textItem name="AvgPremiumKPI">
+            <dataSource>Avg Premium</dataSource>
+            <type>kpi</type>
+            <label>Average Annual Premium</label>
+          </textItem>
+
+          <!-- Bar Chart: Decision Breakdown -->
+          <chart name="DecisionBreakdownChart">
+            <type>bar</type>
+            <query>MainQuery</query>
+            <categories>Decision</categories>
+            <values>Total Policies Issued</values>
+            <title>Underwriting Decisions Distribution</title>
+          </chart>
+
+          <!-- Line Chart: Monthly Volume Trend -->
+          <chart name="MonthlyVolumeTrend">
+            <type>line</type>
+            <query>MainQuery</query>
+            <categories>Issue Date</categories>
+            <values>Total Policies Issued</values>
+            <values>Total Face Amount</values>
+            <title>Monthly Policy Volume and Face Amount Trend</title>
+          </chart>
+
+          <!-- Crosstab: Province x Rating Class -->
+          <crosstab name="ProvinceRatingCrosstab">
+            <query>MainQuery</query>
+            <rows>Province</rows>
+            <columns>Rating Class</columns>
+            <measures>Total Policies Issued</measures>
+            <measures>Avg Premium</measures>
+            <title>Policy Distribution by Province and Rating Class</title>
+          </crosstab>
+
+          <!-- Pie Chart: Smoker Distribution -->
+          <chart name="SmokerDistributionChart">
+            <type>pie</type>
+            <query>MainQuery</query>
+            <categories>Smoker Status</categories>
+            <values>Total Policies Issued</values>
+            <title>Smoker vs Non-Smoker Distribution</title>
+          </chart>
+
+          <!-- Data List: Top Policies -->
+          <list name="TopPoliciesList">
+            <query>MainQuery</query>
+            <columns>Policy ID, Issue Date, Face Amount, Annual Premium, Rating Class, Table Rating, Decision</columns>
+            <title>Policy Detail</title>
+            <sorting>Face Amount DESC</sorting>
+          </list>
+
+        </pageBody>
+
+        <pageFilters>
+          <parameterFilter name="DateRangeFilter">
+            <parameter>StartDate</parameter>
+            <parameter>EndDate</parameter>
+            <type>dateRange</type>
+            <label>Report Date Range</label>
+          </parameterFilter>
+          <parameterFilter name="DecisionFilter">
+            <parameter>DecisionType</parameter>
+            <type>multiSelect</type>
+            <values>Approved, Rated, Declined, Postponed</values>
+            <label>Decision Type</label>
+          </parameterFilter>
+          <parameterFilter name="ProvinceFilter">
+            <parameter>ProvinceCode</parameter>
+            <type>multiSelect</type>
+            <label>Province</label>
+          </parameterFilter>
+        </pageFilters>
+      </page>
+    </reportPages>
+  </layout>
+
+  <prompts>
+    <prompt name="StartDate" type="date" required="true" defaultValue="2024-01-01"/>
+    <prompt name="EndDate" type="date" required="true" defaultValue="2024-12-31"/>
+    <prompt name="DecisionType" type="multiSelect" required="false"/>
+    <prompt name="ProvinceCode" type="multiSelect" required="false"/>
+  </prompts>
+
+</report>
