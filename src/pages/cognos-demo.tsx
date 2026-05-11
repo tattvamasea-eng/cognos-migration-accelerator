@@ -465,7 +465,7 @@ export default function CognosDemo() {
       React.createElement("div", { className: "nav-brand" }, "Migration Accelerator - Cognos to Power BI"),
       [["score","Score"],["migrate","Migrate"],["preview","Preview"]].map(([id,label]) =>
         React.createElement("button", { key: id, className: "tab-btn" + (tab === id ? " active" : ""), onClick: () => setTab(id) }, label)
-      )
+      ),
       React.createElement("a", { href: "/scorer", className: "tab-btn", style: { textDecoration: "none", marginLeft: "auto" } }, "📊 Advanced Scorer")
     ),
     tab === "score" && React.createElement(ScoreTab, null),
