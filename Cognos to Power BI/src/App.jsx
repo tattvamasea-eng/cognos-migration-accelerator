@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import IntakeTab from "./IntakeTab.jsx";
 
 const styles = `
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -137,18 +138,36 @@ function calcScore(state) {
   return { total, tier, drivers, effort: tier === "LOW" ? "1-2 days" : tier === "MEDIUM" ? "3-5 days" : "6-12+ days" };
 }
 
-function ScoreTab() {
-  const [form, setForm] = useState({ reportName: "UW_LifeIns_Mortality_Qtly", numVisuals: 9, numQueries: 2, numFilters: 4, visType: "cross", calcType: "medium", filterType: "dynamic" });
+function ScoreTab({ intakeData }) {
+  const defaults = intakeData ? {
+    reportName: intakeData.report_name || "Unknown",
+    numVisuals: intakeData.summary?.visual_count || 0,
+    numQueries: intakeData.summary?.query_count || 0,
+    numFilters: intakeData.summary?.filter_count || 0,
+    visType: intakeData.scored?.visType || "basic",
+    calcType: intakeData.scored?.calcType || "simple",
+    filterType: intakeData.scored?.filterType || "static",
+  } : { reportName: "UW_LifeIns_Mortality_Qtly", numVisuals: 9, numQueries: 2, numFilters: 4, visType: "cross", calcType: "medium", filterType: "dynamic" };
+  const [form, setForm] = useState(defaults);
   const [risks, setRisks] = useState([8, 7, 11]);
+  useEffect(() => { if (intakeData) setForm(defaults); }, [intakeData]);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const toggleRisk = (val) => setRisks(r => r.includes(val) ? r.filter(x => x !== val) : [...r, val]);
   const { total, tier, drivers, effort } = calcScore({ ...form, risks });
   const badgeClass = tier === "LOW" ? "badge-low" : tier === "MEDIUM" ? "badge-medium" : "badge-high";
   const numClass = tier === "LOW" ? "score-low" : tier === "MEDIUM" ? "score-med" : "score-high";
+  const fromIntake = !!intakeData;
   return (
     React.createElement("div", { className: "panel" },
       React.createElement("div", { className: "section-title" }, "Complexity Scorer"),
-      React.createElement("div", { className: "section-sub" }, "Evaluate a Cognos report and estimate migration effort to Power BI"),
+      React.createElement("div", { className: "section-sub" }, fromIntake
+        ? "Auto-populated from intake: " + (intakeData.report_name || "uploaded report")
+        : "Evaluate a Cognos report and estimate migration effort to Power BI"
+      ),
+      fromIntake && React.createElement("div", {
+        style: { padding: "8px 12px", background: "#d1fae5", border: "1px solid #6ee7b7",
+          borderRadius: 6, fontSize: 12, color: "#065f46", marginBottom: 16 }
+      }, "\u2705 Fields auto-populated from report extraction. Adjust values if needed."),
       React.createElement("div", { className: "score-grid" },
         React.createElement("div", { className: "card" },
           React.createElement("div", { className: "card-title" }, "Report Information"),
@@ -216,23 +235,41 @@ function ScoreTab() {
   );
 }
 
-function MigrateTab() {
+function MigrateTab({ intakeData, apiMode }) {
   const [steps, setSteps] = useState(STEPS.map(() => "idle"));
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
   const [running, setRunning] = useState(false);
   const [resultTab, setResultTab] = useState("json");
+  const [liveResult, setLiveResult] = useState(null);
 
   const run = async () => {
     if (running) return;
-    setRunning(true); setDone(false); setSteps(STEPS.map(() => "idle")); setProgress(0);
+    setRunning(true); setDone(false); setLiveResult(null);
+    setSteps(STEPS.map(() => "idle")); setProgress(0);
+
+    // Try live API if we have XML content
+    const canUseLive = apiMode === "live" && intakeData?.xmlContent;
+    let apiResult = null;
+
     for (let i = 0; i < STEPS.length; i++) {
       setSteps(s => s.map((v, j) => j === i ? "running" : v));
       setProgress(Math.round((i / STEPS.length) * 80));
-      await new Promise(r => setTimeout(r, 900 + Math.random() * 400));
+
+      if (canUseLive && i === 0) {
+        // On first step, fire the real API call
+        try {
+          const form = new FormData();
+          form.append("xml_text", intakeData.xmlContent);
+          const res = await fetch("http://localhost:8000/api/migrate", { method: "POST", body: form });
+          if (res.ok) apiResult = await res.json();
+        } catch (e) { /* fall back to simulated */ }
+      }
+      await new Promise(r => setTimeout(r, 600 + Math.random() * 300));
       setSteps(s => s.map((v, j) => j === i ? "done" : v));
     }
     setProgress(100); setDone(true); setRunning(false);
+    if (apiResult) setLiveResult(apiResult);
   };
 
   const jsonOutput = `{
@@ -249,7 +286,7 @@ function MigrateTab() {
     { "code": "PIPEDA_PII", "severity": "high", "visual": "V7", "field": "applicant_dob" }
   ],
   "status": "COMPLETE"
-}`;
+}`;  const displayJson = liveResult ? JSON.stringify(liveResult, null, 2) : jsonOutput;
 
   const daxOutput = `-- LifeInsurance_Measures_Generated.dax
 -- Auto-generated by Migration Accelerator v1.0.0
@@ -273,12 +310,18 @@ DEFINE
 
   return React.createElement("div", { className: "panel" },
     React.createElement("div", { className: "section-title" }, "Migration Pipeline"),
-    React.createElement("div", { className: "section-sub" }, "Simulated pipeline: Cognos XML to IR to Rule Engine to Validator to Output"),
+    React.createElement("div", { className: "section-sub" },
+      liveResult ? "Live pipeline results from FastAPI backend" :
+      intakeData ? "Pipeline ready: " + (intakeData.report_name || intakeData.fileName) :
+      "Simulated pipeline: Cognos XML to IR to Rule Engine to Validator to Output"
+    ),
     React.createElement("div", { className: "card", style: { marginBottom: 16 } },
       React.createElement("div", { className: "card-title" }, "Source Report"),
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 16 } },
         React.createElement("div", { style: { background: "#f0f6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: "10px 16px", fontSize: 12, color: "#1e40af", fontFamily: "monospace", flex: 1 } },
-          "LifeInsurance_UW_Mortality_Report.xml - 9 visuals - 2 queries - 4 prompts"
+          intakeData
+            ? (intakeData.fileName || intakeData.report_name) + " \u2022 " + (intakeData.summary?.visual_count || 0) + " visuals \u2022 " + (intakeData.summary?.query_count || 0) + " queries \u2022 " + (intakeData.summary?.prompt_count || 0) + " prompts"
+            : "LifeInsurance_UW_Mortality_Report.xml - 9 visuals - 2 queries - 4 prompts"
         ),
         React.createElement("button", { className: "btn-primary", onClick: run, disabled: running }, running ? "Running..." : "Run Pipeline")
       ),
@@ -318,8 +361,11 @@ DEFINE
           React.createElement("button", { className: "result-tab" + (resultTab === "dax" ? " active" : ""), onClick: () => setResultTab("dax") }, "Measures_Generated.dax")
         ),
         resultTab === "json"
-          ? React.createElement("div", { className: "json-block" }, jsonOutput)
-          : React.createElement("div", { className: "dax-block" }, daxOutput)
+          ? React.createElement("div", { className: "json-block" }, displayJson)
+          : React.createElement("div", { className: "dax-block" }, liveResult
+              ? (liveResult.dax_measures || []).map(m => m.dax_measure).join("\n\n")
+              : daxOutput
+            )
       )
     )
   );
@@ -458,17 +504,26 @@ function PreviewTab() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState("score");
+  const [tab, setTab] = useState("intake");
+  const [intakeData, setIntakeData] = useState(null);
+  const [apiMode, setApiMode] = useState("offline");
+
+  const handleAnalyzed = (data) => {
+    setIntakeData(data);
+    if (data.goToScore) setTab("score");
+  };
+
   return React.createElement("div", null,
     React.createElement("style", null, styles),
     React.createElement("div", { className: "top-nav" },
-      React.createElement("div", { className: "nav-brand" }, "Migration Accelerator - Cognos to Power BI"),
-      [["score","Score"],["migrate","Migrate"],["preview","Preview"]].map(([id,label]) =>
+      React.createElement("div", { className: "nav-brand" }, "Migration Accelerator \u2022 Cognos \u2192 Power BI"),
+      [["intake","\ud83d\udce5 Intake"],["score","\ud83d\udcca Score"],["migrate","\u2699\ufe0f Migrate"],["preview","\ud83d\udda5\ufe0f Preview"]].map(([id,label]) =>
         React.createElement("button", { key: id, className: "tab-btn" + (tab === id ? " active" : ""), onClick: () => setTab(id) }, label)
       )
     ),
-    tab === "score" && React.createElement(ScoreTab, null),
-    tab === "migrate" && React.createElement(MigrateTab, null),
+    tab === "intake" && React.createElement(IntakeTab, { onAnalyzed: handleAnalyzed, apiMode, setApiMode }),
+    tab === "score" && React.createElement(ScoreTab, { intakeData }),
+    tab === "migrate" && React.createElement(MigrateTab, { intakeData, apiMode }),
     tab === "preview" && React.createElement(PreviewTab, null)
   );
 }
