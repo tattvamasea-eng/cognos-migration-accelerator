@@ -9,14 +9,20 @@ This project automates IBM Cognos Analytics report migration to Microsoft Power 
 
 ## Live Demo
 
-Two interactive pages are available on Zo:
+**Zo Preview (authenticated, you only):**
+- Open `file '/home/workspace/cognos-migration-accelerator'` in the Zo app → click the preview iframe
+- Or visit: `https://zite-54924-{host}.zo.computer` (shown in Zo UI)
+
+**Routes:**
 
 | Route | Description |
 |-------|-------------|
 | `/` | **5-step wizard** — Upload → Extract → Score → Migrate → Preview |
 | `/scorer` | **Standalone dark-mode scorer** — SVG gauge, per-item counting, JSON export |
 
-**Note:** Publishing the site for external audiences requires clicking the **Publish** button in the Zo UI. A platform-side sandbox issue prevents programmatic publishing via the `publish_site` tool.
+**For external audiences:** Click the **Publish** button in the Zo UI toolbar. This creates a public URL (e.g., `https://cognos-migration-accelerator-tattvamasi.zocomputer.io`).
+
+> **Note:** A platform-side sandbox issue prevents programmatic publishing via the `publish_site` tool. Use the Zo UI Publish button instead.
 
 ---
 
