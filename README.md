@@ -9,14 +9,24 @@ This project automates IBM Cognos Analytics report migration to Microsoft Power 
 
 ## Live Demo
 
-Two interactive pages are available on Zo:
+**Run locally (no API keys needed):**
+The demo runs entirely in the browser — no backend, no API access, no credentials. Your team can run it on any machine:
 
-| Route | Description |
-|-------|-------------|
-| `/` | **5-step wizard** — Upload → Extract → Score → Migrate → Preview |
-| `/scorer` | **Standalone dark-mode scorer** — SVG gauge, per-item counting, JSON export |
+```bash
+git clone https://github.com/tattvamasea-eng/cognos-migration-accelerator.git
+cd cognos-migration-accelerator
+npm install
+npm run dev
+```
+Then open `http://localhost:5175`.
 
-**Note:** Publishing the site for external audiences requires clicking the **Publish** button in the Zo UI. A platform-side sandbox issue prevents programmatic publishing via the `publish_site` tool.
+**Zo-hosted preview (authenticated):**
+Open `file '/home/workspace/cognos-migration-accelerator'` in the Zo app to see the preview iframe, or visit the `zite-54924-*` URL shown in the Zo UI.
+
+> **Note:** The Zo preview requires you to be signed in. For a public URL accessible to anyone without login, click the **Publish** button in the Zo Sites UI — this creates a `*.zocomputer.io` URL.
+
+**GitHub push status:**
+Local commits have been made but **not yet pushed** to GitHub (GitHub CLI needs authentication on this machine). Run `git push origin main` after connecting your GitHub account to sync.
 
 ---
 
