@@ -1,0 +1,504 @@
+import { useState } from "react";
+import { ChevronRight, ChevronDown, FileCode, Folder, FolderOpen, Play, Bot, Database, Brain, FileCheck, GitCompare, ArrowRight, Shield, Zap, CheckCircle, AlertTriangle, Clock } from "lucide-react";
+
+// ═══════════════════════════════════════════════════════════════════
+// DEMO MODE — Pre-generated pipeline output (no backend needed)
+// ═══════════════════════════════════════════════════════════════════
+const DEMO_OUTPUT = {
+  report_name: "Life_Insurance_Underwriting_Summary",
+  source_system: "IBM Cognos Analytics 14.1",
+  target_system: "Microsoft Power BI",
+  pipeline_version: "1.0.0",
+  generated_at: "2026-05-08T22:07:47Z",
+  summary: {
+    visual_count: 9, filter_count: 3, calc_count: 8, field_count: 21, prompt_count: 4, query_count: 2
+  },
+  agents: [
+    {
+      id: "gatherer",
+      name: "Code Gatherer",
+      icon: Database,
+      status: "complete",
+      description: "XPath-based XML parser extracts all visual definitions, queries, filters, prompts, and data source references from Cognos report spec.",
+      output: { visuals: 9, queries: 2, filters: 3, prompts: 4, data_fields: 21 },
+      duration_ms: 120
+    },
+    {
+      id: "analyzer",
+      name: "Analyzer",
+      icon: Brain,
+      status: "complete",
+      description: "Complexity scoring engine evaluates migration difficulty across 7 dimensions: visual types, calculated measures, filter complexity, crosstabs, parameterized prompts, unsupported features, data model complexity.",
+      output: { band: "Medium", score: 52, risk: "Medium", effort: "16–48 hours (recommended: 32)" },
+      duration_ms: 45
+    },
+    {
+      id: "converter",
+      name: "Converter",
+      icon: Play,
+      status: "complete",
+      description: "Rule-based engine maps Cognos visuals → Power BI equivalents, translates Cognos expressions → DAX measures, and generates migration notes for each component.",
+      output: { visuals_mapped: "9/9", measures_generated: 8, auto_translated: 6, needs_review: 2, migration_notes: 3 },
+      duration_ms: 210
+    },
+    {
+      id: "reviewer",
+      name: "Reviewer",
+      icon: FileCheck,
+      status: "warn",
+      description: "Validation engine runs 7 quality checks: visual mapping coverage, DAX translation coverage, filter/prompt alignment, row count parity, measure values, filter behavior, NULL handling.",
+      output: { checks_passed: 1, checks_warned: 2, checks_stubbed: 4 },
+      warnings: ["⏳ Row count comparison requires live XMLA endpoint", "⏳ Measure value spot-checks need SDK access", "⚠ 2 visuals need partial manual config", "⚠ 2 DAX measures need manual review"],
+      duration_ms: 85
+    }
+  ],
+  visuals: [
+    { id: "DecisionBreakdownChart", type: "bar_chart", pbi: "clusteredBarChart", mapping: "full", title: "Underwriting Decisions Distribution" },
+    { id: "MonthlyVolumeTrend", type: "line_chart", pbi: "lineChart", mapping: "full", title: "Monthly Policy Volume and Face Amount Trend" },
+    { id: "SmokerDistributionChart", type: "pie_chart", pbi: "pieChart", mapping: "full", title: "Smoker vs Non-Smoker Distribution" },
+    { id: "TotalPoliciesKPI", type: "card", pbi: "card", mapping: "full", title: "Total Policies Issued" },
+    { id: "TotalFaceAmountKPI", type: "card", pbi: "card", mapping: "full", title: "Total Face Amount ($)" },
+    { id: "STPRateKPI", type: "card", pbi: "card", mapping: "full", title: "STP Rate (%)" },
+    { id: "AvgPremiumKPI", type: "card", pbi: "card", mapping: "full", title: "Average Annual Premium" },
+    { id: "ProvinceRatingCrosstab", type: "matrix", pbi: "matrix", mapping: "partial", title: "Policy Distribution by Province and Rating Class" },
+    { id: "TopPoliciesList", type: "table", pbi: "tableEx", mapping: "partial", title: "Policy Detail" },
+  ],
+  dax_measures: [
+    { name: "Total Policies Issued", method: "pattern_matched", review: false },
+    { name: "Total Face Amount", method: "pattern_matched", review: false },
+    { name: "Avg Premium", method: "pattern_matched", review: false },
+    { name: "STP Rate", method: "pattern_matched", review: true },
+    { name: "Rated Cases", method: "pattern_matched", review: true },
+    { name: "Policy Count", method: "pattern_matched", review: false },
+    { name: "Total Premium", method: "pattern_matched", review: false },
+    { name: "Avg Risk Score", method: "pattern_matched", review: false },
+  ],
+  complexity_drivers: [
+    "Partial-support visuals (2): +10 pts",
+    "Crosstab/matrix visuals (1): +8 pts",
+    "Calculated measures (2): +8 pts",
+    "Date range filters (1): +5 pts",
+    "Multi-select filters (2): +6 pts",
+    "Multiple queries (2): +3 pts",
+    "Parameterized prompts (4): +12 pts",
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// VS CODE-STYLE SOLUTION EXPLORER
+// ═══════════════════════════════════════════════════════════════════
+interface FileNode { name: string; type: "folder" | "file"; children?: FileNode[]; icon?: string }
+
+const PROJECT_TREE: FileNode[] = [
+  {
+    name: "cognos-migration-accelerator", type: "folder", children: [
+      { name: ".gitignore", type: "file" },
+      { name: "package.json", type: "file" },
+      { name: "README.md", type: "file" },
+      { name: "SECURITY_SUMMARY.md", type: "file" },
+      { name: "vite.config.ts", type: "file" },
+      { name: "index.html", type: "file" },
+      {
+        name: "src", type: "folder", children: [
+          { name: "main.tsx", type: "file" },
+          { name: "App.tsx", type: "file" },
+          { name: "styles.css", type: "file" },
+          {
+            name: "pages", type: "folder", children: [
+              { name: "cognos-agentic.tsx", type: "file", icon: "⚡" },
+              { name: "complexity-scorer.tsx", type: "file" },
+            ]
+          },
+        ]
+      },
+      {
+        name: "server", type: "folder", children: [
+          { name: "index.ts", type: "file", icon: "🚀" },
+          { name: "package.json", type: "file" },
+        ]
+      },
+      {
+        name: "pipeline", type: "folder", children: [
+          { name: "requirements.txt", type: "file" },
+          {
+            name: "pipeline", type: "folder", children: [
+              { name: "extractor.py", type: "file" },
+              { name: "ir_generator.py", type: "file" },
+              { name: "rule_engine.py", type: "file" },
+              { name: "complexity_scorer.py", type: "file" },
+              { name: "validator.py", type: "file" },
+              { name: "main.py", type: "file" },
+              { name: "mock_cognos_report.xml", type: "file" },
+            ]
+          },
+          {
+            name: "output", type: "folder", children: [
+              { name: "migration_result.json", type: "file" },
+              { name: "LifeInsurance_Measures_Generated.dax", type: "file" },
+            ]
+          },
+        ]
+      },
+    ]
+  }
+];
+
+function TreeRow({ node, depth = 0 }: { node: FileNode; depth?: number }) {
+  const [open, setOpen] = useState(depth < 1);
+  const isFolder = node.type === "folder";
+  const pad = { paddingLeft: `${depth * 16 + 8}px` };
+
+  return (
+    <>
+      <div
+        className={`flex items-center gap-1.5 py-0.5 cursor-pointer hover:bg-white/5 text-[12px] ${isFolder ? "text-zinc-300" : "text-zinc-400"}`}
+        style={pad}
+        onClick={() => isFolder && setOpen(!open)}
+      >
+        {isFolder ? (
+          open ? <ChevronDown size={12} className="text-zinc-500" /> : <ChevronRight size={12} className="text-zinc-500" />
+        ) : <span className="w-3" />}
+        {isFolder ? (
+          open ? <FolderOpen size={14} className="text-amber-500 shrink-0" /> : <Folder size={14} className="text-amber-500 shrink-0" />
+        ) : (
+          <FileCode size={14} className="text-blue-400 shrink-0" />
+        )}
+        <span className="truncate">{node.name}</span>
+        {node.icon && <span className="ml-auto text-[10px]">{node.icon}</span>}
+      </div>
+      {isFolder && open && node.children?.map((child, i) => (
+        <TreeRow key={i} node={child} depth={depth + 1} />
+      ))}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENT PIPELINE COMPONENT
+// ═══════════════════════════════════════════════════════════════════
+function AgentPipeline() {
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
+  const agents = DEMO_OUTPUT.agents;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 mb-4">
+        <Bot size={18} className="text-emerald-400" />
+        <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Agentic AI Pipeline</h2>
+        <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">DEMO MODE</span>
+      </div>
+
+      {/* Pipeline flow */}
+      <div className="flex items-center gap-0 flex-wrap">
+        {agents.map((agent, i) => (
+          <div key={agent.id} className="flex items-center gap-0">
+            <button
+              onClick={() => setActiveAgent(activeAgent === agent.id ? null : agent.id)}
+              className={`group flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all min-w-[120px] cursor-pointer
+                ${activeAgent === agent.id
+                  ? "border-emerald-500/50 bg-emerald-500/10"
+                  : agent.status === "warn"
+                    ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50"
+                    : "border-zinc-700/50 bg-zinc-800/50 hover:border-zinc-600"}`}
+            >
+              <div className={`p-2 rounded-md ${agent.status === "warn" ? "bg-amber-500/15" : "bg-emerald-500/15"}`}>
+                <agent.icon size={20} className={agent.status === "warn" ? "text-amber-400" : "text-emerald-400"} />
+              </div>
+              <span className="text-[11px] font-medium text-zinc-200 text-center">{agent.name}</span>
+              <span className={`text-[9px] uppercase tracking-widest ${agent.status === "warn" ? "text-amber-400" : "text-emerald-400"}`}>
+                {agent.status === "warn" ? "⚠ WARN" : "✓ DONE"}
+              </span>
+              <span className="text-[9px] text-zinc-500">{agent.duration_ms}ms</span>
+            </button>
+            {i < agents.length - 1 && <ArrowRight size={16} className="text-zinc-600 mx-1 shrink-0" />}
+          </div>
+        ))}
+      </div>
+
+      {/* Agent detail panel */}
+      {activeAgent && (() => {
+        const agent = agents.find(a => a.id === activeAgent)!;
+        return (
+          <div className="mt-3 p-4 rounded-lg border border-emerald-500/20 bg-black/30">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-100">{agent.name}</h3>
+                <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">{agent.description}</p>
+              </div>
+              <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">{agent.duration_ms}ms</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(agent.output).map(([k, v]) => (
+                <div key={k} className="bg-zinc-800/50 rounded px-3 py-1.5">
+                  <span className="text-[10px] text-zinc-500 uppercase">{k.replace(/_/g, " ")}</span>
+                  <div className="text-xs text-zinc-200 font-mono">{String(v)}</div>
+                </div>
+              ))}
+            </div>
+            {agent.warnings && (
+              <div className="mt-3 space-y-1">
+                {agent.warnings.map((w, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-[11px] text-amber-400">
+                    <AlertTriangle size={11} className="shrink-0 mt-0.5" />
+                    <span>{w}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// AGENTIC vs RPA COMPARISON
+// ═══════════════════════════════════════════════════════════════════
+function ComparisonTable() {
+  const rows = [
+    { aspect: "Approach", agentic: "Multi-agent pipeline: Gatherer → Analyzer → Converter → Reviewer", rpa: "Screen-scraping macros; button-by-button recording" },
+    { aspect: "XML Parsing", agentic: "XPath-based semantic extraction — understands report structure", rpa: "Pixel-matching or OCR — brittle, breaks on UI changes" },
+    { aspect: "Visual Mapping", agentic: "Canonical IR with rule engine — supports 15+ visual types", rpa: "Manual copy-paste or hard-coded mapping per report" },
+    { aspect: "DAX Translation", agentic: "Pattern-matching engine with 20+ expression patterns. Auto-generates all 8 measures.", rpa: "Requires SME to manually rewrite every Cognos expression" },
+    { aspect: "Validation", agentic: "6 quality checks: mapping coverage, DAX parity, row counts, measure values, filter behavior, NULL handling", rpa: "No validation — errors discovered in production" },
+    { aspect: "Scalability", agentic: "Process 50+ reports in parallel. Each agent runs independently.", rpa: "One report at a time. Each takes 2-3x longer." },
+    { aspect: "Maintainability", agentic: "Add new visual type → update one rule in VISUAL_MAP. 5 minutes.", rpa: "Re-record entire macro. Hours per change." },
+    { aspect: "Audit Trail", agentic: "Full IR + migration notes per visual + validation report in JSON", rpa: "None — outputs are opaque" },
+  ];
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <GitCompare size={18} className="text-blue-400" />
+        <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Agentic AI vs. RPA/Legacy</h2>
+      </div>
+      <div className="overflow-x-auto rounded-lg border border-zinc-700/50">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="bg-zinc-800/50">
+              <th className="text-left p-2.5 text-zinc-400 font-medium uppercase tracking-wider w-32">Dimension</th>
+              <th className="text-left p-2.5 text-emerald-400 font-medium uppercase tracking-wider">🤖 Agentic AI</th>
+              <th className="text-left p-2.5 text-zinc-500 font-medium uppercase tracking-wider">🖥 RPA / Legacy</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={i} className={i % 2 === 0 ? "bg-zinc-900/30" : "bg-zinc-900/10"}>
+                <td className="p-2.5 text-zinc-300 font-medium">{row.aspect}</td>
+                <td className="p-2.5 text-zinc-200">{row.agentic}</td>
+                <td className="p-2.5 text-zinc-500">{row.rpa}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// VISUAL MAPPING / DAX TABS
+// ═══════════════════════════════════════════════════════════════════
+function OutputTabs() {
+  const [tab, setTab] = useState<"visuals" | "dax" | "complexity">("visuals");
+
+  const tabs = [
+    { id: "visuals", label: "Visual Mapping (9)", icon: Play },
+    { id: "dax", label: "DAX Measures (8)", icon: FileCode },
+    { id: "complexity", label: "Complexity Drivers", icon: AlertTriangle },
+  ] as const;
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <FileCheck size={18} className="text-purple-400" />
+        <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Migration Output</h2>
+      </div>
+
+      <div className="flex gap-1 mb-3">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-medium transition-all cursor-pointer
+              ${tab === t.id ? "bg-zinc-700 text-zinc-100" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"}`}
+          >
+            <t.icon size={13} />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "visuals" && (
+        <div className="rounded-lg border border-zinc-700/50 overflow-hidden">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-zinc-800/50">
+                <th className="text-left p-2 text-zinc-400">Visual</th>
+                <th className="text-left p-2 text-zinc-400">Cognos Type</th>
+                <th className="text-left p-2 text-zinc-400">Power BI</th>
+                <th className="text-left p-2 text-zinc-400">Mapping</th>
+              </tr>
+            </thead>
+            <tbody>
+              {DEMO_OUTPUT.visuals.map((v, i) => (
+                <tr key={v.id} className={i % 2 === 0 ? "bg-zinc-900/30" : ""}>
+                  <td className="p-2 text-zinc-200 font-mono text-[11px]">{v.title}</td>
+                  <td className="p-2 text-zinc-400 font-mono text-[11px]">{v.type}</td>
+                  <td className="p-2 text-zinc-300 font-mono text-[11px]">{v.pbi}</td>
+                  <td className="p-2">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium
+                      ${v.mapping === "full" ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}`}>
+                      {v.mapping === "full" ? "full" : "partial"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === "dax" && (
+        <div className="rounded-lg border border-zinc-700/50 overflow-hidden">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-zinc-800/50">
+                <th className="text-left p-2 text-zinc-400">Measure</th>
+                <th className="text-left p-2 text-zinc-400">Method</th>
+                <th className="text-left p-2 text-zinc-400">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {DEMO_OUTPUT.dax_measures.map((m, i) => (
+                <tr key={m.name} className={i % 2 === 0 ? "bg-zinc-900/30" : ""}>
+                  <td className="p-2 text-zinc-200 font-mono text-[11px]">{m.name}</td>
+                  <td className="p-2 text-zinc-400 font-mono text-[11px]">{m.method}</td>
+                  <td className="p-2">
+                    {m.review ? (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-medium">REVIEW</span>
+                    ) : (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-medium">AUTO</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {tab === "complexity" && (
+        <div className="rounded-lg border border-zinc-700/50 p-4 bg-zinc-900/30">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-amber-400">52</div>
+              <div className="text-[9px] text-zinc-500 uppercase">Score</div>
+            </div>
+            <div className="h-8 w-px bg-zinc-700" />
+            <div>
+              <div className="text-sm font-semibold text-amber-400">Medium Complexity</div>
+              <div className="text-[10px] text-zinc-500">16–48 hours (recommended: 32)</div>
+            </div>
+          </div>
+          <div className="space-y-1">
+            {DEMO_OUTPUT.complexity_drivers.map((d, i) => (
+              <div key={i} className="text-[11px] text-zinc-400 font-mono">• {d}</div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN PAGE
+// ═══════════════════════════════════════════════════════════════════
+export default function CognosAgenticDemo() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  return (
+    <div className="flex h-screen bg-[#0d0d0d] text-zinc-200 overflow-hidden">
+      {/* ── Solution Explorer Sidebar ── */}
+      <div className={`${sidebarOpen ? "w-72" : "w-0"} transition-all duration-200 border-r border-zinc-800 bg-[#111111] overflow-hidden shrink-0`}>
+        <div className="p-3 border-b border-zinc-800 flex items-center justify-between">
+          <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">Solution Explorer</span>
+          <button onClick={() => setSidebarOpen(false)} className="text-zinc-600 hover:text-zinc-400 cursor-pointer">
+            <ChevronRight size={14} />
+          </button>
+        </div>
+        <div className="overflow-y-auto h-[calc(100vh-40px)] py-1">
+          {PROJECT_TREE.map((node, i) => <TreeRow key={i} node={node} />)}
+        </div>
+      </div>
+
+      {/* ── Main Content ── */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Top bar */}
+        <div className="sticky top-0 z-10 bg-[#0d0d0d]/95 backdrop-blur border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {!sidebarOpen && (
+              <button onClick={() => setSidebarOpen(true)} className="text-zinc-600 hover:text-zinc-400 cursor-pointer">
+                <ChevronRight size={16} />
+              </button>
+            )}
+            <div>
+              <h1 className="text-sm font-semibold text-zinc-100">Cognos → Power BI Migration Accelerator</h1>
+              <p className="text-[10px] text-zinc-500">
+                {DEMO_OUTPUT.report_name} • {DEMO_OUTPUT.source_system} → {DEMO_OUTPUT.target_system}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 bg-zinc-800/50 px-2.5 py-1 rounded-full">
+              <Shield size={11} className="text-emerald-500" />
+              Demo Mode • Zero Egress
+            </span>
+            <span className="text-[9px] text-zinc-600">v{DEMO_OUTPUT.pipeline_version}</span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="max-w-5xl mx-auto p-6 space-y-6">
+          {/* Pipeline Summary */}
+          <div className="grid grid-cols-4 gap-3">
+            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
+              <div className="text-[10px] text-zinc-500 uppercase">Agents</div>
+              <div className="text-lg font-bold text-zinc-100">4</div>
+              <div className="text-[9px] text-zinc-600">Gatherer → Analyzer → Converter → Reviewer</div>
+            </div>
+            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
+              <div className="text-[10px] text-zinc-500 uppercase">Visuals Mapped</div>
+              <div className="text-lg font-bold text-emerald-400">9/9</div>
+              <div className="text-[9px] text-zinc-600">7 full • 2 partial</div>
+            </div>
+            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
+              <div className="text-[10px] text-zinc-500 uppercase">DAX Generated</div>
+              <div className="text-lg font-bold text-emerald-400">8</div>
+              <div className="text-[9px] text-zinc-600">6 auto • 2 review</div>
+            </div>
+            <div className="bg-zinc-900/50 border border-amber-500/20 rounded-lg p-3">
+              <div className="text-[10px] text-zinc-500 uppercase">Complexity</div>
+              <div className="text-lg font-bold text-amber-400">Medium</div>
+              <div className="text-[9px] text-zinc-600">Score: 52 • ~32 hours</div>
+            </div>
+          </div>
+
+          <AgentPipeline />
+          <ComparisonTable />
+          <OutputTabs />
+
+          {/* Footer */}
+          <div className="pt-6 border-t border-zinc-800/50 text-center">
+            <p className="text-[10px] text-zinc-600">
+              Runs entirely in your browser. No API keys. No telemetry. No data leaves your machine.
+              <span className="ml-2 text-zinc-700">Pipeline output from {DEMO_OUTPUT.generated_at}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
