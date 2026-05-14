@@ -30,21 +30,6 @@ Local commits have been made but **not yet pushed** to GitHub (GitHub CLI needs 
 
 ---
 
-## What's New (vs. Original GitHub Repo)
-
-| Change | Before | After |
-|--------|--------|-------|
-| **Demo flow** | 3 isolated tabs (Score / Migrate / Preview) | 5-step wizard with logical progression |
-| **Entry point** | Starts at Score tab | Starts at Upload step with drag-and-drop |
-| **Scoring** | Form-based (numVisuals, numQueries, dropdowns) | Per-item counting (8 visual types × count, 5 calc types × count, 4 filter types × count) |
-| **Visual design** | Light theme, basic styling | Dark theme, SVG gauge, mapping legend, sticky score panel |
-| **Cross-navigation** | None | Link between main wizard and standalone scorer |
-| **Report intake** | None — user had to imagine the report | Animated extraction simulation with mock data |
-| **JSON export** | Button that did nothing | Working file download with full payload |
-| **Pipeline wiring** | Fully simulated (frontend only) | Still simulated — FastAPI backend not yet built |
-
----
-
 ## Completion Status
 
 ### ✅ Done (working code)
