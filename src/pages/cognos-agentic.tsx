@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ChevronRight, ChevronDown, FileCode, Folder, FolderOpen, Play, Bot, Database, Brain, FileCheck, GitCompare, ArrowRight, Shield, Zap, CheckCircle, AlertTriangle, Clock } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { ChevronRight, ChevronDown, FileCode, Folder, FolderOpen, Play, Bot, Database, Brain, FileCheck, GitCompare, ArrowRight, Shield, Zap, CheckCircle, AlertTriangle, Clock, Upload, RefreshCw } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════════
 // DEMO MODE — Pre-generated pipeline output (no backend needed)
@@ -176,10 +176,15 @@ function TreeRow({ node, depth = 0 }: { node: FileNode; depth?: number }) {
 // ═══════════════════════════════════════════════════════════════════
 // AGENT PIPELINE COMPONENT
 // ═══════════════════════════════════════════════════════════════════
-function AgentPipeline() {
-  const [activeAgent, setActiveAgent] = useState<string | null>(null);
-  const agents = DEMO_OUTPUT.agents;
-
+function AgentPipeline({
+  agents,
+  currentPipelineStep,
+  onAgentClick,
+}: {
+  agents: any[];
+  currentPipelineStep: string | null;
+  onAgentClick: (agent: any) => void;
+}) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 mb-4">
@@ -193,9 +198,9 @@ function AgentPipeline() {
         {agents.map((agent, i) => (
           <div key={agent.id} className="flex items-center gap-0">
             <button
-              onClick={() => setActiveAgent(activeAgent === agent.id ? null : agent.id)}
+              onClick={() => onAgentClick(agent)}
               className={`group flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all min-w-[120px] cursor-pointer
-                ${activeAgent === agent.id
+                ${currentPipelineStep === agent.id
                   ? "border-emerald-500/50 bg-emerald-500/10"
                   : agent.status === "warn"
                     ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50"
@@ -216,8 +221,8 @@ function AgentPipeline() {
       </div>
 
       {/* Agent detail panel */}
-      {activeAgent && (() => {
-        const agent = agents.find(a => a.id === activeAgent)!;
+      {currentPipelineStep && (() => {
+        const agent = agents.find(a => a.id === currentPipelineStep)!;
         return (
           <div className="mt-3 p-4 rounded-lg border border-emerald-500/20 bg-black/30">
             <div className="flex items-start justify-between mb-3">
@@ -419,6 +424,56 @@ function OutputTabs() {
 export default function CognosAgenticDemo() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // Pipeline state machine: "idle" | "uploaded" | "running" | "complete"
+  const [phase, setPhase] = useState<"idle" | "uploaded" | "running" | "complete">("idle");
+  const [currentStep, setCurrentStep] = useState(-1);
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const stepTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const agents = DEMO_OUTPUT.agents;
+
+  const startPipeline = useCallback(() => {
+    if (stepTimer.current) clearInterval(stepTimer.current);
+    setPhase("running");
+    setCurrentStep(0);
+    setActiveAgent(agents[0].id);
+    let step = 0;
+    stepTimer.current = setInterval(() => {
+      step++;
+      if (step >= agents.length) {
+        clearInterval(stepTimer.current!);
+        stepTimer.current = null;
+        setPhase("complete");
+        setActiveAgent(null);
+        setCurrentStep(-1);
+      } else {
+        setCurrentStep(step);
+        setActiveAgent(agents[step].id);
+      }
+    }, 1200);
+  }, [agents]);
+
+  const reset = useCallback(() => {
+    if (stepTimer.current) { clearInterval(stepTimer.current); stepTimer.current = null; }
+    setPhase("idle");
+    setCurrentStep(-1);
+    setActiveAgent(null);
+    setUploadedFile(null);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (stepTimer.current) clearInterval(stepTimer.current); };
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    setUploadedFile("Life_Insurance_Underwriting_Summary.xml");
+    setPhase("uploaded");
+  }, []);
+
   return (
     <div className="flex h-screen bg-[#0d0d0d] text-zinc-200 overflow-hidden">
       {/* ── Solution Explorer Sidebar ── */}
@@ -452,6 +507,15 @@ export default function CognosAgenticDemo() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {phase !== "idle" && (
+              <button
+                onClick={reset}
+                className="flex items-center gap-1.5 text-[10px] text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-700/50 px-2.5 py-1 rounded-full transition-all cursor-pointer"
+              >
+                <RefreshCw size={11} />
+                Reset
+              </button>
+            )}
             <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 bg-zinc-800/50 px-2.5 py-1 rounded-full">
               <Shield size={11} className="text-emerald-500" />
               Demo Mode • Zero Egress
@@ -462,41 +526,119 @@ export default function CognosAgenticDemo() {
 
         {/* Content */}
         <div className="max-w-5xl mx-auto p-6 space-y-6">
-          {/* Pipeline Summary */}
-          <div className="grid grid-cols-4 gap-3">
-            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
-              <div className="text-[10px] text-zinc-500 uppercase">Agents</div>
-              <div className="text-lg font-bold text-zinc-100">4</div>
-              <div className="text-[9px] text-zinc-600">Gatherer → Analyzer → Converter → Reviewer</div>
+          {/* ══ Upload Screen (Phase: idle) ══ */}
+          {phase === "idle" && (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                className={`w-full max-w-lg border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer
+                  ${dragOver ? "border-emerald-400 bg-emerald-500/10" : "border-zinc-700 hover:border-zinc-500 bg-zinc-900/30"}`}
+                onClick={() => { setUploadedFile("Life_Insurance_Underwriting_Summary.xml"); setPhase("uploaded"); }}
+              >
+                <Upload size={48} className="mx-auto text-zinc-500 mb-4" />
+                <h3 className="text-base font-semibold text-zinc-200 mb-2">Upload Cognos Report XML</h3>
+                <p className="text-xs text-zinc-500 mb-4">Drag & drop your Cognos report spec here, or click to use the sample</p>
+                <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-600">
+                  <FileCode size={12} /> .xml files • Runs locally • No data leaves your browser
+                </div>
+              </div>
+              <p className="text-[10px] text-zinc-700 mt-6">Click anywhere on the upload area to start with the sample Life Insurance Underwriting report</p>
             </div>
-            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
-              <div className="text-[10px] text-zinc-500 uppercase">Visuals Mapped</div>
-              <div className="text-lg font-bold text-emerald-400">9/9</div>
-              <div className="text-[9px] text-zinc-600">7 full • 2 partial</div>
-            </div>
-            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
-              <div className="text-[10px] text-zinc-500 uppercase">DAX Generated</div>
-              <div className="text-lg font-bold text-emerald-400">8</div>
-              <div className="text-[9px] text-zinc-600">6 auto • 2 review</div>
-            </div>
-            <div className="bg-zinc-900/50 border border-amber-500/20 rounded-lg p-3">
-              <div className="text-[10px] text-zinc-500 uppercase">Complexity</div>
-              <div className="text-lg font-bold text-amber-400">Medium</div>
-              <div className="text-[9px] text-zinc-600">Score: 52 • ~32 hours</div>
-            </div>
-          </div>
+          )}
 
-          <AgentPipeline />
-          <ComparisonTable />
-          <OutputTabs />
+          {/* ══ Upload Confirmation (Phase: uploaded) ══ */}
+          {phase === "uploaded" && (
+            <div className="flex flex-col items-center justify-center py-16 space-y-6">
+              <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-6 py-4">
+                <CheckCircle size={24} className="text-emerald-400" />
+                <div>
+                  <div className="text-sm font-semibold text-zinc-100">Report loaded</div>
+                  <div className="text-[11px] text-zinc-400 font-mono">{uploadedFile}</div>
+                </div>
+              </div>
 
-          {/* Footer */}
-          <div className="pt-6 border-t border-zinc-800/50 text-center">
-            <p className="text-[10px] text-zinc-600">
-              Runs entirely in your browser. No API keys. No telemetry. No data leaves your machine.
-              <span className="ml-2 text-zinc-700">Pipeline output from {DEMO_OUTPUT.generated_at}</span>
-            </p>
-          </div>
+              <button
+                onClick={startPipeline}
+                className="flex items-center gap-2 px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold text-sm transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
+              >
+                <Play size={16} />
+                Run Pipeline
+              </button>
+
+              <button onClick={reset} className="text-[11px] text-zinc-600 hover:text-zinc-400 cursor-pointer">
+                ← Upload a different file
+              </button>
+            </div>
+          )}
+
+          {/* ══ Pipeline Running & Complete ══ */}
+          {(phase === "running" || phase === "complete") && (
+            <>
+              {/* Animated status banner */}
+              {phase === "running" && (
+                <div className="flex items-center gap-3 bg-blue-500/10 border border-blue-500/20 rounded-lg px-5 py-3">
+                  <div className="w-3 h-3 rounded-full bg-blue-400 animate-ping" />
+                  <div className="text-sm font-medium text-blue-400">
+                    Processing: {agents[currentStep]?.name ?? "Starting..."}
+                  </div>
+                  <div className="flex-1" />
+                  <span className="text-[10px] text-zinc-500">
+                    Step {currentStep + 1} of {agents.length}
+                  </span>
+                </div>
+              )}
+
+              {/* Pipeline agent cards */}
+              <AgentPipeline
+                agents={agents.map((a, i) => ({
+                  ...a,
+                  status: phase === "complete"
+                    ? a.status
+                    : i < currentStep ? "complete" : i === currentStep ? "running" : "idle"
+                }))}
+                currentPipelineStep={activeAgent}
+                onAgentClick={(a) => setActiveAgent(activeAgent === a.id ? null : a.id)}
+              />
+
+              {phase === "complete" && (
+                <>
+                  {/* Pipeline Summary */}
+                  <div className="grid grid-cols-4 gap-3">
+                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
+                      <div className="text-[10px] text-zinc-500 uppercase">Agents</div>
+                      <div className="text-lg font-bold text-zinc-100">4</div>
+                      <div className="text-[9px] text-zinc-600">Gatherer → Analyzer → Converter → Reviewer</div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
+                      <div className="text-[10px] text-zinc-500 uppercase">Visuals Mapped</div>
+                      <div className="text-lg font-bold text-emerald-400">9/9</div>
+                      <div className="text-[9px] text-zinc-600">7 full • 2 partial</div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
+                      <div className="text-[10px] text-zinc-500 uppercase">DAX Generated</div>
+                      <div className="text-lg font-bold text-emerald-400">8</div>
+                      <div className="text-[9px] text-zinc-600">6 auto • 2 review</div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-amber-500/20 rounded-lg p-3">
+                      <div className="text-[10px] text-zinc-500 uppercase">Complexity</div>
+                      <div className="text-lg font-bold text-amber-400">Medium</div>
+                      <div className="text-[9px] text-zinc-600">Score: 52 • ~32 hours</div>
+                    </div>
+                  </div>
+                  <ComparisonTable />
+                  <OutputTabs />
+                  <div className="pt-6 border-t border-zinc-800/50 text-center">
+                    <p className="text-[10px] text-zinc-600">
+                      Runs entirely in your browser. No API keys. No telemetry. No data leaves your machine.
+                      <span className="ml-2 text-zinc-700">Pipeline output from {DEMO_OUTPUT.generated_at}</span>
+                    </p>
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
