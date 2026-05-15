@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ChevronRight, ChevronDown, FileCode, Folder, FolderOpen, Play, Bot, Database, Brain, FileCheck, GitCompare, ArrowRight, Shield, Zap, CheckCircle, AlertTriangle, Clock, Upload, RefreshCw } from "lucide-react";
+import { ChevronRight, ChevronDown, FileCode, Folder, FolderOpen, Play, Bot, Database, Brain, FileCheck, GitCompare, ArrowRight, Shield, Zap, CheckCircle, AlertTriangle, Clock, Upload, RefreshCw, BarChart3, TrendingUp, PieChart } from "lucide-react";
 
 // ═══════════════════════════════════════════════════════════════════
 // DEMO MODE — Pre-generated pipeline output (no backend needed)
@@ -306,12 +306,13 @@ function ComparisonTable() {
 // VISUAL MAPPING / DAX TABS
 // ═══════════════════════════════════════════════════════════════════
 function OutputTabs() {
-  const [tab, setTab] = useState<"visuals" | "dax" | "complexity">("visuals");
+  const [tab, setTab] = useState<"visuals" | "dax" | "complexity" | "pbi">("visuals");
 
   const tabs = [
     { id: "visuals", label: "Visual Mapping (9)", icon: Play },
     { id: "dax", label: "DAX Measures (8)", icon: FileCode },
     { id: "complexity", label: "Complexity Drivers", icon: AlertTriangle },
+    { id: "pbi", label: "Power BI Report", icon: BarChart3 },
   ] as const;
 
   return (
@@ -411,6 +412,243 @@ function OutputTabs() {
             {DEMO_OUTPUT.complexity_drivers.map((d, i) => (
               <div key={i} className="text-[11px] text-zinc-400 font-mono">• {d}</div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {tab === "pbi" && (
+        <div className="rounded-lg border border-zinc-700/50 overflow-hidden bg-[#191919]">
+          {/* Power BI header bar */}
+          <div className="bg-[#1a1a1a] border-b border-zinc-700/50 px-4 py-3 flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold text-white">Life Insurance Underwriting Summary</div>
+              <div className="text-[10px] text-zinc-400">Power BI Report</div>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] text-zinc-500">
+              <span className="bg-zinc-700/50 px-2 py-0.5 rounded">Year 2024</span>
+              <span className="bg-zinc-700/50 px-2 py-0.5 rounded">All Provinces</span>
+              <span className="bg-zinc-700/50 px-2 py-0.5 rounded">All Decisions</span>
+            </div>
+          </div>
+          
+          {/* Dashboard grid */}
+          <div className="p-4 space-y-4">
+            {/* KPI Row */}
+            <div className="grid grid-cols-4 gap-3">
+              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">Total Policies Issued</div>
+                <div className="text-2xl font-bold text-white">24,850</div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp size={12} className="text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400">+12.4%</span>
+                </div>
+              </div>
+              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">Total Face Amount ($)</div>
+                <div className="text-2xl font-bold text-white">$3.42B</div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp size={12} className="text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400">+8.9%</span>
+                </div>
+              </div>
+              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">STP Rate (%)</div>
+                <div className="text-2xl font-bold text-white">72.3%</div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp size={12} className="text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400">+3.1pp</span>
+                </div>
+              </div>
+              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">Avg Annual Premium</div>
+                <div className="text-2xl font-bold text-white">$2,845</div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp size={12} className="text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400">+5.2%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts row */}
+            <div className="grid grid-cols-3 gap-3">
+              {/* Bar chart: Underwriting Decisions */}
+              <div className="col-span-2 bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[11px] text-zinc-300 font-medium mb-3">Underwriting Decisions Distribution</div>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                      <span>Approved</span><span>12,842</span>
+                    </div>
+                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                      <div className="h-full bg-emerald-500 rounded" style={{width: "52%"}} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                      <span>Rated</span><span>6,213</span>
+                    </div>
+                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                      <div className="h-full bg-amber-400 rounded" style={{width: "25%"}} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                      <span>Declined</span><span>3,728</span>
+                    </div>
+                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                      <div className="h-full bg-red-400 rounded" style={{width: "15%"}} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                      <span>Postponed</span><span>2,067</span>
+                    </div>
+                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                      <div className="h-full bg-zinc-400 rounded" style={{width: "8%"}} />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-zinc-500">
+                  {["Approved","Rated","Declined","Postponed"].map((l,i) => (
+                    <div key={i} className="flex items-center gap-1">
+                      <div className={`w-2 h-2 rounded ${["bg-emerald-500","bg-amber-400","bg-red-400","bg-zinc-400"][i]}`} />
+                      {l}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pie chart: Smoker Distribution */}
+              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[11px] text-zinc-300 font-medium mb-3">Smoker vs Non-Smoker</div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="relative w-28 h-28 rounded-full border-[10px] border-emerald-500/80 border-l-amber-500/80 border-b-amber-500/80" style={{transform: "rotate(-30deg)"}}>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-sm font-bold text-white">68%</span>
+                      <span className="text-[9px] text-zinc-500">Non-Smoker</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 mt-2 text-[10px] text-zinc-400">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2.5 h-2.5 bg-emerald-500 rounded" />
+                      Non-Smoker (68%)
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2.5 h-2.5 bg-amber-500 rounded" />
+                      Smoker (32%)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Line chart: Monthly Trend */}
+            <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+              <div className="text-[11px] text-zinc-300 font-medium mb-3">Monthly Policy Volume & Face Amount Trend</div>
+              <div className="h-32 flex items-end gap-1 px-2">
+                {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => {
+                  const h1 = [65,68,72,58,78,82,88,92,85,80,75,90][i];
+                  const h2 = [40,45,50,42,55,60,65,70,62,55,50,68][i];
+                  return (
+                    <div key={m} className="flex-1 flex flex-col items-center gap-0.5">
+                      <div className="w-full flex flex-col gap-0.5" style={{height: "120px"}}>
+                        <div style={{height: `${100-h1}%`}} />
+                        <div className="w-3/5 mx-auto bg-blue-400/60 rounded-sm" style={{height: `${h1}%`, background: "linear-gradient(180deg, #60a5fa, #3b82f6)"}} />
+                        <div className="h-0.5" />
+                        <div style={{height: `${100-h2}%`}} />
+                        <div className="w-1/3 mx-auto bg-emerald-400/60 rounded-sm" style={{height: `${h2}%`, background: "linear-gradient(180deg, #34d399, #059669)"}} />
+                      </div>
+                      <span className="text-[8px] text-zinc-500 mt-1">{m}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-center gap-4 mt-2 text-[10px] text-zinc-400">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-1.5 rounded bg-blue-400" /> Policies
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-1.5 rounded bg-emerald-400" /> Face Amount
+                </div>
+              </div>
+            </div>
+
+            {/* Matrix + Table row */}
+            <div className="grid grid-cols-5 gap-3">
+              {/* Matrix: Province x Rating */}
+              <div className="col-span-3 bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[11px] text-zinc-300 font-medium mb-2">Policy Distribution by Province & Rating Class</div>
+                <table className="w-full text-[10px]">
+                  <thead>
+                    <tr className="text-zinc-400">
+                      <th className="text-left py-1">Province</th>
+                      <th className="text-right py-1">Preferred</th>
+                      <th className="text-right py-1">Standard</th>
+                      <th className="text-right py-1">Rated</th>
+                      <th className="text-right py-1 font-medium text-zinc-300">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ["Ontario", "4,210", "2,850", "1,940", "9,000"],
+                      ["Quebec", "2,100", "1,680", "980", "4,760"],
+                      ["British Columbia", "1,890", "1,520", "740", "4,150"],
+                      ["Alberta", "1,520", "1,180", "560", "3,260"],
+                      ["Manitoba", "640", "480", "220", "1,340"],
+                    ].map((r, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white/[0.02]" : ""}>
+                        <td className="py-1 text-zinc-300">{r[0]}</td>
+                        {r.slice(1, 4).map((v, j) => (
+                          <td key={j} className="text-right py-1 text-zinc-400">{v}</td>
+                        ))}
+                        <td className="text-right py-1 font-medium text-zinc-200">{r[4]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Table: Policy Detail */}
+              <div className="col-span-2 bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
+                <div className="text-[11px] text-zinc-300 font-medium mb-2">Top Policies by Face Amount</div>
+                <table className="w-full text-[10px]">
+                  <thead>
+                    <tr className="text-zinc-500">
+                      <th className="text-left py-1">Policy ID</th>
+                      <th className="text-right py-1">Face Amt</th>
+                      <th className="text-right py-1">Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ["POL-2024-0842", "$5.2M", "Approved"],
+                      ["POL-2024-1501", "$4.8M", "Rated"],
+                      ["POL-2024-0298", "$4.5M", "Approved"],
+                      ["POL-2024-1124", "$3.9M", "Approved"],
+                      ["POL-2024-0765", "$3.6M", "Declined"],
+                    ].map((r, i) => (
+                      <tr key={i} className={i % 2 === 0 ? "bg-white/[0.02]" : ""}>
+                        <td className="py-1 text-blue-400 font-mono">{r[0]}</td>
+                        <td className="text-right py-1 text-zinc-300">{r[1]}</td>
+                        <td className="text-right py-1">
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] ${
+                            r[2] === "Approved" ? "bg-emerald-500/15 text-emerald-400" :
+                            r[2] === "Rated" ? "bg-amber-500/15 text-amber-400" :
+                            "bg-red-500/15 text-red-400"
+                          }`}>{r[2]}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          {/* Footer */}
+          <div className="px-4 py-2 border-t border-zinc-700/30 flex items-center justify-between text-[9px] text-zinc-600">
+            <span>All 9 visuals migrated from Cognos — 7 full auto-mapping, 2 partial</span>
+            <span>Generated {DEMO_OUTPUT.generated_at}</span>
           </div>
         </div>
       )}
