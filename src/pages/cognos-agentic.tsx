@@ -151,12 +151,12 @@ function TreeRow({ node, depth = 0 }: { node: FileNode; depth?: number }) {
   return (
     <>
       <div
-        className={`flex items-center gap-1.5 py-0.5 cursor-pointer hover:bg-white/5 text-[12px] ${isFolder ? "text-zinc-300" : "text-zinc-400"}`}
+        className={`flex items-center gap-1.5 py-0.5 cursor-pointer hover:bg-gray-50 text-[12px] ${isFolder ? "text-gray-700" : "text-gray-600"}`}
         style={pad}
         onClick={() => isFolder && setOpen(!open)}
       >
         {isFolder ? (
-          open ? <ChevronDown size={12} className="text-zinc-500" /> : <ChevronRight size={12} className="text-zinc-500" />
+          open ? <ChevronDown size={12} className="text-gray-500" /> : <ChevronRight size={12} className="text-gray-500" />
         ) : <span className="w-3" />}
         {isFolder ? (
           open ? <FolderOpen size={14} className="text-amber-500 shrink-0" /> : <Folder size={14} className="text-amber-500 shrink-0" />
@@ -189,8 +189,8 @@ function AgentPipeline({
     <div className="space-y-3">
       <div className="flex items-center gap-2 mb-4">
         <Bot size={18} className="text-emerald-400" />
-        <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Agentic AI Pipeline</h2>
-        <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">DEMO MODE</span>
+        <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Agentic AI Pipeline</h2>
+        <span className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">DEMO MODE</span>
       </div>
 
       {/* Pipeline flow */}
@@ -204,16 +204,16 @@ function AgentPipeline({
                   ? "border-emerald-500/50 bg-emerald-500/10"
                   : agent.status === "warn"
                     ? "border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50"
-                    : "border-zinc-700/50 bg-zinc-800/50 hover:border-zinc-600"}`}
+                    : "border-gray-200/50 bg-gray-50/50 hover:border-gray-300"}`}
             >
               <div className={`p-2 rounded-md ${agent.status === "warn" ? "bg-amber-500/15" : "bg-emerald-500/15"}`}>
                 <agent.icon size={20} className={agent.status === "warn" ? "text-amber-400" : "text-emerald-400"} />
               </div>
-              <span className="text-[11px] font-medium text-zinc-200 text-center">{agent.name}</span>
+              <span className="text-[11px] font-medium text-gray-800 text-center">{agent.name}</span>
               <span className={`text-[9px] uppercase tracking-widest ${agent.status === "warn" ? "text-amber-400" : "text-emerald-400"}`}>
                 {agent.status === "warn" ? "⚠ WARN" : "✓ DONE"}
               </span>
-              <span className="text-[9px] text-zinc-500">{agent.duration_ms}ms</span>
+              <span className="text-[9px] text-gray-500">{agent.duration_ms}ms</span>
             </button>
             {i < agents.length - 1 && <ArrowRight size={16} className="text-zinc-600 mx-1 shrink-0" />}
           </div>
@@ -224,19 +224,19 @@ function AgentPipeline({
       {currentPipelineStep && (() => {
         const agent = agents.find(a => a.id === currentPipelineStep)!;
         return (
-          <div className="mt-3 p-4 rounded-lg border border-emerald-500/20 bg-black/30">
+          <div className="mt-3 p-4 rounded-lg border border-emerald-500/20 bg-white/30">
             <div className="flex items-start justify-between mb-3">
               <div>
-                <h3 className="text-sm font-semibold text-zinc-100">{agent.name}</h3>
-                <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">{agent.description}</p>
+                <h3 className="text-sm font-semibold text-gray-900">{agent.name}</h3>
+                <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">{agent.description}</p>
               </div>
-              <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">{agent.duration_ms}ms</span>
+              <span className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded">{agent.duration_ms}ms</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(agent.output).map(([k, v]) => (
-                <div key={k} className="bg-zinc-800/50 rounded px-3 py-1.5">
-                  <span className="text-[10px] text-zinc-500 uppercase">{k.replace(/_/g, " ")}</span>
-                  <div className="text-xs text-zinc-200 font-mono">{String(v)}</div>
+                <div key={k} className="bg-gray-50/50 rounded px-3 py-1.5">
+                  <span className="text-[10px] text-gray-500 uppercase">{k.replace(/_/g, " ")}</span>
+                  <div className="text-xs text-gray-800 font-mono">{String(v)}</div>
                 </div>
               ))}
             </div>
@@ -276,23 +276,23 @@ function ComparisonTable() {
     <div className="mt-6">
       <div className="flex items-center gap-2 mb-3">
         <GitCompare size={18} className="text-blue-400" />
-        <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Agentic AI vs. RPA/Legacy</h2>
+        <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Agentic AI vs. RPA/Legacy</h2>
       </div>
-      <div className="overflow-x-auto rounded-lg border border-zinc-700/50">
+      <div className="overflow-x-auto rounded-lg border border-gray-200/50">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-zinc-800/50">
-              <th className="text-left p-2.5 text-zinc-400 font-medium uppercase tracking-wider w-32">Dimension</th>
+            <tr className="bg-gray-50/50">
+              <th className="text-left p-2.5 text-gray-600 font-medium uppercase tracking-wider w-32">Dimension</th>
               <th className="text-left p-2.5 text-emerald-400 font-medium uppercase tracking-wider">🤖 Agentic AI</th>
-              <th className="text-left p-2.5 text-zinc-500 font-medium uppercase tracking-wider">🖥 RPA / Legacy</th>
+              <th className="text-left p-2.5 text-gray-500 font-medium uppercase tracking-wider">🖥 RPA / Legacy</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className={i % 2 === 0 ? "bg-zinc-900/30" : "bg-zinc-900/10"}>
-                <td className="p-2.5 text-zinc-300 font-medium">{row.aspect}</td>
-                <td className="p-2.5 text-zinc-200">{row.agentic}</td>
-                <td className="p-2.5 text-zinc-500">{row.rpa}</td>
+              <tr key={i} className={i % 2 === 0 ? "bg-white/30" : "bg-gray-100"}>
+                <td className="p-2.5 text-gray-700 font-medium">{row.aspect}</td>
+                <td className="p-2.5 text-gray-800">{row.agentic}</td>
+                <td className="p-2.5 text-gray-500">{row.rpa}</td>
               </tr>
             ))}
           </tbody>
@@ -319,7 +319,7 @@ function OutputTabs() {
     <div className="mt-6">
       <div className="flex items-center gap-2 mb-3">
         <FileCheck size={18} className="text-purple-400" />
-        <h2 className="text-sm font-semibold text-zinc-100 uppercase tracking-wider">Migration Output</h2>
+        <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Migration Output</h2>
       </div>
 
       <div className="flex gap-1 mb-3">
@@ -328,7 +328,7 @@ function OutputTabs() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-medium transition-all cursor-pointer
-              ${tab === t.id ? "bg-zinc-700 text-zinc-100" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"}`}
+              ${tab === t.id ? "bg-zinc-700 text-gray-900" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"}`}
           >
             <t.icon size={13} />
             {t.label}
@@ -337,22 +337,22 @@ function OutputTabs() {
       </div>
 
       {tab === "visuals" && (
-        <div className="rounded-lg border border-zinc-700/50 overflow-hidden">
+        <div className="rounded-lg border border-gray-200/50 overflow-hidden">
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-zinc-800/50">
-                <th className="text-left p-2 text-zinc-400">Visual</th>
-                <th className="text-left p-2 text-zinc-400">Cognos Type</th>
-                <th className="text-left p-2 text-zinc-400">Power BI</th>
-                <th className="text-left p-2 text-zinc-400">Mapping</th>
+              <tr className="bg-gray-50/50">
+                <th className="text-left p-2 text-gray-600">Visual</th>
+                <th className="text-left p-2 text-gray-600">Cognos Type</th>
+                <th className="text-left p-2 text-gray-600">Power BI</th>
+                <th className="text-left p-2 text-gray-600">Mapping</th>
               </tr>
             </thead>
             <tbody>
               {DEMO_OUTPUT.visuals.map((v, i) => (
-                <tr key={v.id} className={i % 2 === 0 ? "bg-zinc-900/30" : ""}>
-                  <td className="p-2 text-zinc-200 font-mono text-[11px]">{v.title}</td>
-                  <td className="p-2 text-zinc-400 font-mono text-[11px]">{v.type}</td>
-                  <td className="p-2 text-zinc-300 font-mono text-[11px]">{v.pbi}</td>
+                <tr key={v.id} className={i % 2 === 0 ? "bg-white/30" : ""}>
+                  <td className="p-2 text-gray-800 font-mono text-[11px]">{v.title}</td>
+                  <td className="p-2 text-gray-600 font-mono text-[11px]">{v.type}</td>
+                  <td className="p-2 text-gray-700 font-mono text-[11px]">{v.pbi}</td>
                   <td className="p-2">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium
                       ${v.mapping === "full" ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}`}>
@@ -367,20 +367,20 @@ function OutputTabs() {
       )}
 
       {tab === "dax" && (
-        <div className="rounded-lg border border-zinc-700/50 overflow-hidden">
+        <div className="rounded-lg border border-gray-200/50 overflow-hidden">
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-zinc-800/50">
-                <th className="text-left p-2 text-zinc-400">Measure</th>
-                <th className="text-left p-2 text-zinc-400">Method</th>
-                <th className="text-left p-2 text-zinc-400">Status</th>
+              <tr className="bg-gray-50/50">
+                <th className="text-left p-2 text-gray-600">Measure</th>
+                <th className="text-left p-2 text-gray-600">Method</th>
+                <th className="text-left p-2 text-gray-600">Status</th>
               </tr>
             </thead>
             <tbody>
               {DEMO_OUTPUT.dax_measures.map((m, i) => (
-                <tr key={m.name} className={i % 2 === 0 ? "bg-zinc-900/30" : ""}>
-                  <td className="p-2 text-zinc-200 font-mono text-[11px]">{m.name}</td>
-                  <td className="p-2 text-zinc-400 font-mono text-[11px]">{m.method}</td>
+                <tr key={m.name} className={i % 2 === 0 ? "bg-white/30" : ""}>
+                  <td className="p-2 text-gray-800 font-mono text-[11px]">{m.name}</td>
+                  <td className="p-2 text-gray-600 font-mono text-[11px]">{m.method}</td>
                   <td className="p-2">
                     {m.review ? (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-medium">REVIEW</span>
@@ -396,38 +396,38 @@ function OutputTabs() {
       )}
 
       {tab === "complexity" && (
-        <div className="rounded-lg border border-zinc-700/50 p-4 bg-zinc-900/30">
+        <div className="rounded-lg border border-gray-200/50 p-4 bg-white/30">
           <div className="flex items-center gap-3 mb-3">
             <div className="text-center">
               <div className="text-3xl font-bold text-amber-400">52</div>
-              <div className="text-[9px] text-zinc-500 uppercase">Score</div>
+              <div className="text-[9px] text-gray-500 uppercase">Score</div>
             </div>
             <div className="h-8 w-px bg-zinc-700" />
             <div>
               <div className="text-sm font-semibold text-amber-400">Medium Complexity</div>
-              <div className="text-[10px] text-zinc-500">16–48 hours (recommended: 32)</div>
+              <div className="text-[10px] text-gray-500">16–48 hours (recommended: 32)</div>
             </div>
           </div>
           <div className="space-y-1">
             {DEMO_OUTPUT.complexity_drivers.map((d, i) => (
-              <div key={i} className="text-[11px] text-zinc-400 font-mono">• {d}</div>
+              <div key={i} className="text-[11px] text-gray-600 font-mono">• {d}</div>
             ))}
           </div>
         </div>
       )}
 
       {tab === "pbi" && (
-        <div className="rounded-lg border border-zinc-700/50 overflow-hidden bg-[#191919]">
+        <div className="rounded-lg border border-gray-200/50 overflow-hidden bg-white">
           {/* Power BI header bar */}
-          <div className="bg-[#1a1a1a] border-b border-zinc-700/50 px-4 py-3 flex items-center justify-between">
+          <div className="bg-gray-50 border-b border-gray-200/50 px-4 py-3 flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold text-white">Life Insurance Underwriting Summary</div>
-              <div className="text-[10px] text-zinc-400">Power BI Report</div>
+              <div className="text-sm font-semibold text-gray-900">Life Insurance Underwriting Summary</div>
+              <div className="text-[10px] text-gray-600">Power BI Report</div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-zinc-500">
-              <span className="bg-zinc-700/50 px-2 py-0.5 rounded">Year 2024</span>
-              <span className="bg-zinc-700/50 px-2 py-0.5 rounded">All Provinces</span>
-              <span className="bg-zinc-700/50 px-2 py-0.5 rounded">All Decisions</span>
+            <div className="flex items-center gap-2 text-[10px] text-gray-500">
+              <span className="bg-gray-100 px-2 py-0.5 rounded">Year 2024</span>
+              <span className="bg-gray-100 px-2 py-0.5 rounded">All Provinces</span>
+              <span className="bg-gray-100 px-2 py-0.5 rounded">All Decisions</span>
             </div>
           </div>
           
@@ -435,33 +435,33 @@ function OutputTabs() {
           <div className="p-4 space-y-4">
             {/* KPI Row */}
             <div className="grid grid-cols-4 gap-3">
-              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">Total Policies Issued</div>
-                <div className="text-2xl font-bold text-white">24,850</div>
+              <div className="bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[10px] text-gray-600 uppercase mb-2 tracking-wider">Total Policies Issued</div>
+                <div className="text-2xl font-bold text-gray-900">24,850</div>
                 <div className="flex items-center gap-1 mt-1">
                   <TrendingUp size={12} className="text-emerald-400" />
                   <span className="text-[10px] text-emerald-400">+12.4%</span>
                 </div>
               </div>
-              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">Total Face Amount ($)</div>
-                <div className="text-2xl font-bold text-white">$3.42B</div>
+              <div className="bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[10px] text-gray-600 uppercase mb-2 tracking-wider">Total Face Amount ($)</div>
+                <div className="text-2xl font-bold text-gray-900">$3.42B</div>
                 <div className="flex items-center gap-1 mt-1">
                   <TrendingUp size={12} className="text-emerald-400" />
                   <span className="text-[10px] text-emerald-400">+8.9%</span>
                 </div>
               </div>
-              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">STP Rate (%)</div>
-                <div className="text-2xl font-bold text-white">72.3%</div>
+              <div className="bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[10px] text-gray-600 uppercase mb-2 tracking-wider">STP Rate (%)</div>
+                <div className="text-2xl font-bold text-gray-900">72.3%</div>
                 <div className="flex items-center gap-1 mt-1">
                   <TrendingUp size={12} className="text-emerald-400" />
                   <span className="text-[10px] text-emerald-400">+3.1pp</span>
                 </div>
               </div>
-              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[10px] text-zinc-400 uppercase mb-2 tracking-wider">Avg Annual Premium</div>
-                <div className="text-2xl font-bold text-white">$2,845</div>
+              <div className="bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[10px] text-gray-600 uppercase mb-2 tracking-wider">Avg Annual Premium</div>
+                <div className="text-2xl font-bold text-gray-900">$2,845</div>
                 <div className="flex items-center gap-1 mt-1">
                   <TrendingUp size={12} className="text-emerald-400" />
                   <span className="text-[10px] text-emerald-400">+5.2%</span>
@@ -472,43 +472,43 @@ function OutputTabs() {
             {/* Charts row */}
             <div className="grid grid-cols-3 gap-3">
               {/* Bar chart: Underwriting Decisions */}
-              <div className="col-span-2 bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[11px] text-zinc-300 font-medium mb-3">Underwriting Decisions Distribution</div>
+              <div className="col-span-2 bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[11px] text-gray-700 font-medium mb-3">Underwriting Decisions Distribution</div>
                 <div className="space-y-3">
                   <div>
-                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                    <div className="flex justify-between text-[10px] text-gray-600 mb-1">
                       <span>Approved</span><span>12,842</span>
                     </div>
-                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                    <div className="h-5 bg-gray-100 rounded overflow-hidden">
                       <div className="h-full bg-emerald-500 rounded" style={{width: "52%"}} />
                     </div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                    <div className="flex justify-between text-[10px] text-gray-600 mb-1">
                       <span>Rated</span><span>6,213</span>
                     </div>
-                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                    <div className="h-5 bg-gray-100 rounded overflow-hidden">
                       <div className="h-full bg-amber-400 rounded" style={{width: "25%"}} />
                     </div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                    <div className="flex justify-between text-[10px] text-gray-600 mb-1">
                       <span>Declined</span><span>3,728</span>
                     </div>
-                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                    <div className="h-5 bg-gray-100 rounded overflow-hidden">
                       <div className="h-full bg-red-400 rounded" style={{width: "15%"}} />
                     </div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-[10px] text-zinc-400 mb-1">
+                    <div className="flex justify-between text-[10px] text-gray-600 mb-1">
                       <span>Postponed</span><span>2,067</span>
                     </div>
-                    <div className="h-5 bg-zinc-700/50 rounded overflow-hidden">
+                    <div className="h-5 bg-gray-100 rounded overflow-hidden">
                       <div className="h-full bg-zinc-400 rounded" style={{width: "8%"}} />
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-zinc-500">
+                <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-gray-500">
                   {["Approved","Rated","Declined","Postponed"].map((l,i) => (
                     <div key={i} className="flex items-center gap-1">
                       <div className={`w-2 h-2 rounded ${["bg-emerald-500","bg-amber-400","bg-red-400","bg-zinc-400"][i]}`} />
@@ -519,16 +519,16 @@ function OutputTabs() {
               </div>
 
               {/* Pie chart: Smoker Distribution */}
-              <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[11px] text-zinc-300 font-medium mb-3">Smoker vs Non-Smoker</div>
+              <div className="bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[11px] text-gray-700 font-medium mb-3">Smoker vs Non-Smoker</div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="relative w-28 h-28 rounded-full border-[10px] border-emerald-500/80 border-l-amber-500/80 border-b-amber-500/80" style={{transform: "rotate(-30deg)"}}>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-sm font-bold text-white">68%</span>
-                      <span className="text-[9px] text-zinc-500">Non-Smoker</span>
+                      <span className="text-sm font-bold text-gray-900">68%</span>
+                      <span className="text-[9px] text-gray-500">Non-Smoker</span>
                     </div>
                   </div>
-                  <div className="flex gap-4 mt-2 text-[10px] text-zinc-400">
+                  <div className="flex gap-4 mt-2 text-[10px] text-gray-600">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2.5 h-2.5 bg-emerald-500 rounded" />
                       Non-Smoker (68%)
@@ -543,8 +543,8 @@ function OutputTabs() {
             </div>
 
             {/* Line chart: Monthly Trend */}
-            <div className="bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-              <div className="text-[11px] text-zinc-300 font-medium mb-3">Monthly Policy Volume & Face Amount Trend</div>
+            <div className="bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+              <div className="text-[11px] text-gray-700 font-medium mb-3">Monthly Policy Volume & Face Amount Trend</div>
               <div className="h-32 flex items-end gap-1 px-2">
                 {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => {
                   const h1 = [65,68,72,58,78,82,88,92,85,80,75,90][i];
@@ -558,12 +558,12 @@ function OutputTabs() {
                         <div style={{height: `${100-h2}%`}} />
                         <div className="w-1/3 mx-auto bg-emerald-400/60 rounded-sm" style={{height: `${h2}%`, background: "linear-gradient(180deg, #34d399, #059669)"}} />
                       </div>
-                      <span className="text-[8px] text-zinc-500 mt-1">{m}</span>
+                      <span className="text-[8px] text-gray-500 mt-1">{m}</span>
                     </div>
                   );
                 })}
               </div>
-              <div className="flex justify-center gap-4 mt-2 text-[10px] text-zinc-400">
+              <div className="flex justify-center gap-4 mt-2 text-[10px] text-gray-600">
                 <div className="flex items-center gap-1.5">
                   <div className="w-3 h-1.5 rounded bg-blue-400" /> Policies
                 </div>
@@ -576,16 +576,16 @@ function OutputTabs() {
             {/* Matrix + Table row */}
             <div className="grid grid-cols-5 gap-3">
               {/* Matrix: Province x Rating */}
-              <div className="col-span-3 bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[11px] text-zinc-300 font-medium mb-2">Policy Distribution by Province & Rating Class</div>
+              <div className="col-span-3 bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[11px] text-gray-700 font-medium mb-2">Policy Distribution by Province & Rating Class</div>
                 <table className="w-full text-[10px]">
                   <thead>
-                    <tr className="text-zinc-400">
+                    <tr className="text-gray-600">
                       <th className="text-left py-1">Province</th>
                       <th className="text-right py-1">Preferred</th>
                       <th className="text-right py-1">Standard</th>
                       <th className="text-right py-1">Rated</th>
-                      <th className="text-right py-1 font-medium text-zinc-300">Total</th>
+                      <th className="text-right py-1 font-medium text-gray-700">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -597,11 +597,11 @@ function OutputTabs() {
                       ["Manitoba", "640", "480", "220", "1,340"],
                     ].map((r, i) => (
                       <tr key={i} className={i % 2 === 0 ? "bg-white/[0.02]" : ""}>
-                        <td className="py-1 text-zinc-300">{r[0]}</td>
+                        <td className="py-1 text-gray-700">{r[0]}</td>
                         {r.slice(1, 4).map((v, j) => (
-                          <td key={j} className="text-right py-1 text-zinc-400">{v}</td>
+                          <td key={j} className="text-right py-1 text-gray-600">{v}</td>
                         ))}
-                        <td className="text-right py-1 font-medium text-zinc-200">{r[4]}</td>
+                        <td className="text-right py-1 font-medium text-gray-800">{r[4]}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -609,11 +609,11 @@ function OutputTabs() {
               </div>
 
               {/* Table: Policy Detail */}
-              <div className="col-span-2 bg-[#1e1e1e] border border-zinc-700/30 rounded-lg p-4">
-                <div className="text-[11px] text-zinc-300 font-medium mb-2">Top Policies by Face Amount</div>
+              <div className="col-span-2 bg-gray-50 border border-gray-200/30 rounded-lg p-4">
+                <div className="text-[11px] text-gray-700 font-medium mb-2">Top Policies by Face Amount</div>
                 <table className="w-full text-[10px]">
                   <thead>
-                    <tr className="text-zinc-500">
+                    <tr className="text-gray-500">
                       <th className="text-left py-1">Policy ID</th>
                       <th className="text-right py-1">Face Amt</th>
                       <th className="text-right py-1">Decision</th>
@@ -629,7 +629,7 @@ function OutputTabs() {
                     ].map((r, i) => (
                       <tr key={i} className={i % 2 === 0 ? "bg-white/[0.02]" : ""}>
                         <td className="py-1 text-blue-400 font-mono">{r[0]}</td>
-                        <td className="text-right py-1 text-zinc-300">{r[1]}</td>
+                        <td className="text-right py-1 text-gray-700">{r[1]}</td>
                         <td className="text-right py-1">
                           <span className={`px-1.5 py-0.5 rounded text-[9px] ${
                             r[2] === "Approved" ? "bg-emerald-500/15 text-emerald-400" :
@@ -646,7 +646,7 @@ function OutputTabs() {
           </div>
           
           {/* Footer */}
-          <div className="px-4 py-2 border-t border-zinc-700/30 flex items-center justify-between text-[9px] text-zinc-600">
+          <div className="px-4 py-2 border-t border-gray-200/30 flex items-center justify-between text-[9px] text-zinc-600">
             <span>All 9 visuals migrated from Cognos — 7 full auto-mapping, 2 partial</span>
             <span>Generated {DEMO_OUTPUT.generated_at}</span>
           </div>
@@ -713,12 +713,12 @@ export default function CognosAgenticDemo() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#0d0d0d] text-zinc-200 overflow-hidden">
+    <div className="flex h-screen bg-[#0d0d0d] text-gray-800 overflow-hidden">
       {/* ── Solution Explorer Sidebar ── */}
-      <div className={`${sidebarOpen ? "w-72" : "w-0"} transition-all duration-200 border-r border-zinc-800 bg-[#111111] overflow-hidden shrink-0`}>
-        <div className="p-3 border-b border-zinc-800 flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold">Solution Explorer</span>
-          <button onClick={() => setSidebarOpen(false)} className="text-zinc-600 hover:text-zinc-400 cursor-pointer">
+      <div className={`${sidebarOpen ? "w-72" : "w-0"} transition-all duration-200 border-r border-gray-200 bg-gray-50 overflow-hidden shrink-0`}>
+        <div className="p-3 border-b border-gray-200 flex items-center justify-between">
+          <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">Solution Explorer</span>
+          <button onClick={() => setSidebarOpen(false)} className="text-zinc-600 hover:text-gray-600 cursor-pointer">
             <ChevronRight size={14} />
           </button>
         </div>
@@ -730,16 +730,16 @@ export default function CognosAgenticDemo() {
       {/* ── Main Content ── */}
       <div className="flex-1 overflow-y-auto">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[#0d0d0d]/95 backdrop-blur border-b border-zinc-800 px-6 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-[#0d0d0d]/95 backdrop-blur border-b border-gray-200 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {!sidebarOpen && (
-              <button onClick={() => setSidebarOpen(true)} className="text-zinc-600 hover:text-zinc-400 cursor-pointer">
+              <button onClick={() => setSidebarOpen(true)} className="text-zinc-600 hover:text-gray-600 cursor-pointer">
                 <ChevronRight size={16} />
               </button>
             )}
             <div>
-              <h1 className="text-sm font-semibold text-zinc-100">Cognos → Power BI Migration Accelerator</h1>
-              <p className="text-[10px] text-zinc-500">
+              <h1 className="text-sm font-semibold text-gray-900">Cognos → Power BI Migration Accelerator</h1>
+              <p className="text-[10px] text-gray-500">
                 {DEMO_OUTPUT.report_name} • {DEMO_OUTPUT.source_system} → {DEMO_OUTPUT.target_system}
               </p>
             </div>
@@ -748,13 +748,13 @@ export default function CognosAgenticDemo() {
             {phase !== "idle" && (
               <button
                 onClick={reset}
-                className="flex items-center gap-1.5 text-[10px] text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-700/50 px-2.5 py-1 rounded-full transition-all cursor-pointer"
+                className="flex items-center gap-1.5 text-[10px] text-gray-600 hover:text-gray-800 bg-gray-50/50 hover:bg-gray-100/50 px-2.5 py-1 rounded-full transition-all cursor-pointer"
               >
                 <RefreshCw size={11} />
                 Reset
               </button>
             )}
-            <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 bg-zinc-800/50 px-2.5 py-1 rounded-full">
+            <span className="flex items-center gap-1.5 text-[10px] text-gray-500 bg-gray-50/50 px-2.5 py-1 rounded-full">
               <Shield size={11} className="text-emerald-500" />
               Demo Mode • Zero Egress
             </span>
@@ -772,12 +772,12 @@ export default function CognosAgenticDemo() {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
                 className={`w-full max-w-lg border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer
-                  ${dragOver ? "border-emerald-400 bg-emerald-500/10" : "border-zinc-700 hover:border-zinc-500 bg-zinc-900/30"}`}
+                  ${dragOver ? "border-emerald-400 bg-emerald-500/10" : "border-gray-200 hover:border-gray-300 bg-white/30"}`}
                 onClick={() => { setUploadedFile("Life_Insurance_Underwriting_Summary.xml"); setPhase("uploaded"); }}
               >
-                <Upload size={48} className="mx-auto text-zinc-500 mb-4" />
-                <h3 className="text-base font-semibold text-zinc-200 mb-2">Upload Cognos Report XML</h3>
-                <p className="text-xs text-zinc-500 mb-4">Drag & drop your Cognos report spec here, or click to use the sample</p>
+                <Upload size={48} className="mx-auto text-gray-500 mb-4" />
+                <h3 className="text-base font-semibold text-gray-800 mb-2">Upload Cognos Report XML</h3>
+                <p className="text-xs text-gray-500 mb-4">Drag & drop your Cognos report spec here, or click to use the sample</p>
                 <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-600">
                   <FileCode size={12} /> .xml files • Runs locally • No data leaves your browser
                 </div>
@@ -792,20 +792,20 @@ export default function CognosAgenticDemo() {
               <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg px-6 py-4">
                 <CheckCircle size={24} className="text-emerald-400" />
                 <div>
-                  <div className="text-sm font-semibold text-zinc-100">Report loaded</div>
-                  <div className="text-[11px] text-zinc-400 font-mono">{uploadedFile}</div>
+                  <div className="text-sm font-semibold text-gray-900">Report loaded</div>
+                  <div className="text-[11px] text-gray-600 font-mono">{uploadedFile}</div>
                 </div>
               </div>
 
               <button
                 onClick={startPipeline}
-                className="flex items-center gap-2 px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold text-sm transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
+                className="flex items-center gap-2 px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-gray-900 rounded-lg font-semibold text-sm transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
               >
                 <Play size={16} />
                 Run Pipeline
               </button>
 
-              <button onClick={reset} className="text-[11px] text-zinc-600 hover:text-zinc-400 cursor-pointer">
+              <button onClick={reset} className="text-[11px] text-zinc-600 hover:text-gray-600 cursor-pointer">
                 ← Upload a different file
               </button>
             </div>
@@ -822,7 +822,7 @@ export default function CognosAgenticDemo() {
                     Processing: {agents[currentStep]?.name ?? "Starting..."}
                   </div>
                   <div className="flex-1" />
-                  <span className="text-[10px] text-zinc-500">
+                  <span className="text-[10px] text-gray-500">
                     Step {currentStep + 1} of {agents.length}
                   </span>
                 </div>
@@ -844,30 +844,30 @@ export default function CognosAgenticDemo() {
                 <>
                   {/* Pipeline Summary */}
                   <div className="grid grid-cols-4 gap-3">
-                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
-                      <div className="text-[10px] text-zinc-500 uppercase">Agents</div>
-                      <div className="text-lg font-bold text-zinc-100">4</div>
+                    <div className="bg-gray-500 border border-gray-200/50 rounded-lg p-3">
+                      <div className="text-[10px] text-gray-500 uppercase">Agents</div>
+                      <div className="text-lg font-bold text-gray-900">4</div>
                       <div className="text-[9px] text-zinc-600">Gatherer → Analyzer → Converter → Reviewer</div>
                     </div>
-                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
-                      <div className="text-[10px] text-zinc-500 uppercase">Visuals Mapped</div>
+                    <div className="bg-gray-500 border border-gray-200/50 rounded-lg p-3">
+                      <div className="text-[10px] text-gray-500 uppercase">Visuals Mapped</div>
                       <div className="text-lg font-bold text-emerald-400">9/9</div>
                       <div className="text-[9px] text-zinc-600">7 full • 2 partial</div>
                     </div>
-                    <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-3">
-                      <div className="text-[10px] text-zinc-500 uppercase">DAX Generated</div>
+                    <div className="bg-gray-500 border border-gray-200/50 rounded-lg p-3">
+                      <div className="text-[10px] text-gray-500 uppercase">DAX Generated</div>
                       <div className="text-lg font-bold text-emerald-400">8</div>
                       <div className="text-[9px] text-zinc-600">6 auto • 2 review</div>
                     </div>
-                    <div className="bg-zinc-900/50 border border-amber-500/20 rounded-lg p-3">
-                      <div className="text-[10px] text-zinc-500 uppercase">Complexity</div>
+                    <div className="bg-gray-500 border border-amber-500/20 rounded-lg p-3">
+                      <div className="text-[10px] text-gray-500 uppercase">Complexity</div>
                       <div className="text-lg font-bold text-amber-400">Medium</div>
                       <div className="text-[9px] text-zinc-600">Score: 52 • ~32 hours</div>
                     </div>
                   </div>
                   <ComparisonTable />
                   <OutputTabs />
-                  <div className="pt-6 border-t border-zinc-800/50 text-center">
+                  <div className="pt-6 border-t border-gray-200/50 text-center">
                     <p className="text-[10px] text-zinc-600">
                       Runs entirely in your browser. No API keys. No telemetry. No data leaves your machine.
                       <span className="ml-2 text-zinc-700">Pipeline output from {DEMO_OUTPUT.generated_at}</span>
