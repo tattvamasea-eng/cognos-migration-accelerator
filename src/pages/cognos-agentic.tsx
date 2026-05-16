@@ -713,7 +713,7 @@ export default function CognosAgenticDemo() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#0d0d0d] text-gray-800 overflow-hidden">
+    <div className="flex h-screen bg-[#fafbfc] text-gray-800 overflow-hidden">
       {/* ── Solution Explorer Sidebar ── */}
       <div className={`${sidebarOpen ? "w-72" : "w-0"} transition-all duration-200 border-r border-gray-200 bg-gray-50 overflow-hidden shrink-0`}>
         <div className="p-3 border-b border-gray-200 flex items-center justify-between">
@@ -730,7 +730,7 @@ export default function CognosAgenticDemo() {
       {/* ── Main Content ── */}
       <div className="flex-1 overflow-y-auto">
         {/* Top bar */}
-        <div className="sticky top-0 z-10 bg-[#0d0d0d]/95 backdrop-blur border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-[#fafbfc]/95 backdrop-blur border-b border-gray-200 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {!sidebarOpen && (
               <button onClick={() => setSidebarOpen(true)} className="text-zinc-600 hover:text-gray-600 cursor-pointer">
